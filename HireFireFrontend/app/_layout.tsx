@@ -11,30 +11,6 @@ import { useColorScheme } from '@/hooks/useColorScheme';
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
-const CustomDarkTheme = {
-  ...DarkTheme,
-  colors: {
-    ...DarkTheme.colors,
-    background: '#1A0D0E',
-    card: '#1A0D0E',
-    text: '#FFFFFF',
-    border: '#333333',
-    primary: '#FF4D4D',
-  },
-};
-
-const CustomLightTheme = {
-  ...DefaultTheme,
-  colors: {
-    ...DefaultTheme.colors,
-    background: '#FFFFFF',
-    card: '#FFFFFF',
-    text: '#000000',
-    border: '#CCCCCC',
-    primary: '#FF4D4D',
-  },
-};
-
 export default function RootLayout() {
   const colorScheme = useColorScheme();
   const [loaded] = useFonts({
@@ -52,12 +28,11 @@ export default function RootLayout() {
   }
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? CustomDarkTheme : CustomLightTheme}>
+    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <Stack>
-        <Stack.Screen name="homePage" options={{ headerShown: false }} />
-        <Stack.Screen name="customerPg2" options={{ headerShown: false }} />
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="+not-found" />
       </Stack>
-
       <StatusBar style="auto" />
     </ThemeProvider>
   );

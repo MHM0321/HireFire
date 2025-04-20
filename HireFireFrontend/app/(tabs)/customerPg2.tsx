@@ -6,8 +6,6 @@ import { useRouter } from 'expo-router';
 import { Feather } from '@expo/vector-icons';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { FontAwesome6 } from '@expo/vector-icons';
-import { Image } from 'react-native';
-
 
 
 import { ThemedText } from '@/components/ThemedText';
@@ -37,63 +35,60 @@ export default function CustomerPg1Screen() {
     <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        {/* Left: Hamburger */}
-        <TouchableOpacity style={styles.leftContainer} onPress={() => console.log('Open drawer or menu')}>
-          <Feather name="menu" size={24} color="#FFFFFF" />
+        <TouchableOpacity onPress={() => router.back()}>
+          <IconSymbol name="line.3.horizontal" size={64} color="#FFFFFF" />
         </TouchableOpacity>
-  
-        {/* Center: Logo */}
-        <View style={styles.centerContainer}>
-          <Image
-            source={require('@/assets/images/logoText.png')}
-            style={styles.logoImage}
-            resizeMode="contain"
-          />
+        
+        <View style={styles.logoContainer}>
+
         </View>
-  
-        {/* Right: Profile */}
-        <TouchableOpacity style={styles.rightContainer} onPress={() => console.log('Go to profile')}>
-          <Feather name="user" size={24} color="#FFFFFF" />
+        
+        <TouchableOpacity>
+          <IconSymbol name="person.circle" size={24} color="#FFFFFF" />
         </TouchableOpacity>
       </View>
-  
-      {/* Search Bar */}
-      <View style={styles.searchContainer}>
+
+       {/* Search Bar */}
+       <View style={styles.searchContainer}>
         <View style={styles.searchBar}>
-          <Feather name="search" size={20} color="#666666" style={styles.searchIcon} />
-          <TextInput
+        <Feather name="search" size={20} color="#666666" style={styles.searchIcon} />
+            <TextInput
             style={styles.searchInput}
-            placeholder="Search category"
+            placeholder="search text"
             placeholderTextColor="#666666"
           />
         </View>
       </View>
-  
-      <ScrollView style={styles.contentContainer}>
-        {/* Categories */}
-        <View style={styles.categoriesContainer}>
-          <ThemedText style={styles.sectionTitle}>Categories</ThemedText>
-          <View style={styles.gridContainer}>
-            {categories.map((item, index) => (
-              <TouchableOpacity key={index} style={styles.categoryCard}>
-                {item.lib === 'Feather' && (
-                  <Feather name={item.icon as any} size={24} color="#FF4D4D" />
-                )}
-                {item.lib === 'Material' && (
-                  <MaterialCommunityIcons name={item.icon as any} size={24} color="#FF4D4D" />
-                )}
-                {item.lib === 'FA' && (
-                  <FontAwesome6 name={item.icon as any} size={24} color="#FF4D4D" />
-                )}
-                <ThemedText style={styles.categoryLabel}>{item.label}</ThemedText>
-              </TouchableOpacity>
-            ))}
-          </View>
+
+      
+      <ScrollView style={styles.contentContainer}>        
+
+        {/* Categories*/}
+      <View style={styles.categoriesContainer}>
+      <ThemedText style={styles.sectionTitle}>Categories</ThemedText>
+      <View style={styles.gridContainer}>
+      
+      {categories.map((item, index) => (
+        <TouchableOpacity key={index} style={styles.categoryCard}>
+        {item.lib === 'Feather' && (
+          <Feather name={item.icon as any} size={24} color="#FF4D4D" />
+        )}
+        {item.lib === 'Material' && (
+          <MaterialCommunityIcons name={item.icon as any} size={24} color="#FF4D4D" />
+        )}
+        {item.lib === 'FA' && (
+          <FontAwesome6 name={item.icon as any} size={24} color="#FF4D4D" />
+        )}
+        <ThemedText style={styles.categoryLabel}>{item.label}</ThemedText>
+      </TouchableOpacity>
+    ))}
+      </View>
         </View>
+
+
       </ScrollView>
     </SafeAreaView>
   );
-  
 }
 
 const styles = StyleSheet.create({
@@ -106,36 +101,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 16,
-    paddingVertical: 38,
+    paddingVertical: 22,
     backgroundColor: '#1A0D0E',
-    position: 'relative',
   },
-  
-  leftContainer: {
-    width: 70,
-    paddingTop: 20,
-    alignItems: 'flex-start',
-    justifyContent: 'center',
-  },
-  
-  centerContainer: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    paddingTop: 30,
+  logoContainer: {
     alignItems: 'center',
-    justifyContent: 'center',
-  },
-  
-  rightContainer: {
-    width: 70,
-    paddingTop: 20,
-    alignItems: 'flex-end',
-    justifyContent: 'center',
-  },
-  logoImage: {
-    width: 120,
-    height: 60,
   },
   contentHeader: {
     backgroundColor: '#F5F0F0',
@@ -193,7 +163,7 @@ const styles = StyleSheet.create({
   },
   searchContainer: {
     paddingHorizontal: 16,
-    paddingBottom: 18,
+    paddingVertical: 6,
     backgroundColor: '#1A0D0E',
   },
   searchBar: {
@@ -202,7 +172,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F5F0F0',
     borderRadius: 24,
     paddingHorizontal: 16,
-    paddingVertical: 3,
+    paddingVertical: 6,
   },
   searchIcon: {
     marginRight: 8,
@@ -212,4 +182,5 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#333333',
   },
+
 });
