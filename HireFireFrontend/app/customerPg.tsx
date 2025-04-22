@@ -1,5 +1,5 @@
 // customerPg.tsx
-import React from 'react';
+import React, { useState } from 'react';
 import { StyleSheet, View, TextInput, TouchableOpacity, SafeAreaView, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
 
@@ -7,7 +7,7 @@ import { Feather } from '@expo/vector-icons';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { FontAwesome6 } from '@expo/vector-icons';
 import { Image } from 'react-native';
-
+import { DateTimePicker } from '@/components/DateTimePicker';
 
 
 import { ThemedText } from '@/components/ThemedText';
@@ -32,6 +32,7 @@ const categories = [
 
 export default function CustomerPgScreen() {
   const router = useRouter();
+  const [selectedDate, setSelectedDate] = useState(new Date());
   
   return (
     <SafeAreaView style={styles.container}>
@@ -63,16 +64,27 @@ export default function CustomerPgScreen() {
           <Feather name="search" size={20} color="#666666" style={styles.searchIcon} />
           <TextInput
             style={styles.searchInput}
-            placeholder="Search category"
+            placeholder="Set Location"
             placeholderTextColor="#666666"
           />
         </View>
       </View>
   
       <ScrollView style={styles.contentContainer}>
+
+        {/* DateTime */}
+        <ThemedText style={styles.DTLabel}>Select Date and Time</ThemedText>
+          <DateTimePicker 
+            initialDate={selectedDate}
+            onDateChange={date => {
+              setSelectedDate(date);
+              console.log("Selected date and time:", date);
+            }}
+          />
+
         {/* Categories */}
         <View style={styles.categoriesContainer}>
-          <ThemedText style={styles.sectionTitle}>Categories</ThemedText>
+          <ThemedText style={styles.sectionTitle}>Select Category</ThemedText>
           <View style={styles.gridContainer}>
             {categories.map((item, index) => (
               <TouchableOpacity key={index} style={styles.categoryCard}>
@@ -159,10 +171,12 @@ const styles = StyleSheet.create({
     paddingTop: 16,
   },
   sectionTitle: {
+    marginTop: 8,
     fontSize: 18,
     fontWeight: 'bold',
     color: '#333333',
     marginBottom: 12,
+    textAlign: 'center',
   },
   gridContainer: {
     flexDirection: 'row',
@@ -211,5 +225,18 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     color: '#333333',
+  },
+  dateTimeContainer: {
+    backgroundColor: '#F5F0F0',
+    paddingHorizontal: 20,
+    paddingTop: 16,
+  },
+  DTLabel: {
+    marginTop: 8,
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333333',
+    marginBottom: 12,
+    textAlign: 'center',
   },
 });
