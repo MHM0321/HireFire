@@ -1,4 +1,4 @@
-// app/(tabs)/customerPg1.tsx
+// customerPg.tsx
 import React from 'react';
 import { StyleSheet, View, TextInput, TouchableOpacity, SafeAreaView, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
@@ -30,7 +30,7 @@ const categories = [
   ];
   
 
-export default function CustomerPg1Screen() {
+export default function CustomerPgScreen() {
   const router = useRouter();
   
   return (

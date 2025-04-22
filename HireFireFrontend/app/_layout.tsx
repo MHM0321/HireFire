@@ -1,3 +1,4 @@
+// layout.tsx
 import { Stack } from 'expo-router';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useColorScheme } from 'react-native';
@@ -38,7 +39,7 @@ export default function Layout() {
           options={{ headerShown: false }} 
         />
         <Stack.Screen 
-          name="customerPg2" 
+          name="customerPg"
           options={{ headerShown: false }} 
         />
         <Stack.Screen 

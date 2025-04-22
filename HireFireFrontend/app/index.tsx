@@ -1,28 +1,19 @@
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 
-export default function HomePage() {
-  const router = useRouter();
+import { Redirect } from 'expo-router';
 
+export default function Index() {
+  return <Redirect href="/customerPg" />;         //un-comment to make it work
+  //put name of any page you want to see on the screen as the first thing you want to see when app opens
+  //just replace customerPg1 with your desired page name and un-comment the line
+  //DO turn it back after changes to avoid conflicts
+  const router = useRouter();
+  
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Welcome!</Text>
-      
-      <TouchableOpacity 
-        style={styles.button} 
-        onPress={() => router.push('/customerPg2')}
-      >
-        <Text style={styles.buttonText}>Go to customerPg2.tsx page</Text>
-      </TouchableOpacity>
 
-      <View style={styles.spacer} />
-
-      <TouchableOpacity 
-        style={styles.redButtonContainer} 
-        onPress={() => router.push('/redButton')}
-      >
-        <Text style={styles.buttonText}>Go to redButton.tsx page</Text>
-      </TouchableOpacity>
     </View>
   );
 }
@@ -58,6 +49,14 @@ const styles = StyleSheet.create({
     height: 20,
   },
   redButtonContainer: {
+    backgroundColor: '#FF4D4D',
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 10,
+    width: '80%',
+    alignItems: 'center',
+  },
+  cpg1Container: {
     backgroundColor: '#FF4D4D',
     paddingHorizontal: 24,
     paddingVertical: 12,
