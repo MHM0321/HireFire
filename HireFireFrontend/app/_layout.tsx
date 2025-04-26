@@ -31,7 +31,9 @@ const CustomLightTheme = {
 export default function Layout() {
   const colorScheme = 'dark';
   
-  return (
+  return ( // Name of the stack is the name of the folder
+    // The stack is the main navigation container (Page Name)
+    // Initially all header shown set to False
     <ThemeProvider value={colorScheme === 'dark' ? CustomDarkTheme : CustomLightTheme}>
       <Stack>
         <Stack.Screen 
@@ -44,7 +46,11 @@ export default function Layout() {
         />
         <Stack.Screen 
           name="redButton" 
-          options={{ headerShown: false }} 
+          options={{ headerShown: false }}
+        /> 
+        <Stack.Screen
+          name="signUP" 
+          options={{ headerShown: false }}
         />
       </Stack>
     </ThemeProvider>
