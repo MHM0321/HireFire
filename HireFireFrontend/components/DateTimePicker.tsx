@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { ViewStyle, StyleProp } from 'react-native';
 import { 
   StyleSheet, 
   View, 
@@ -19,11 +20,13 @@ const MONTHS = [
 type DateTimePickerProps = {
   onDateChange?: (date: Date) => void;
   initialDate?: Date;
+  style?: StyleProp<ViewStyle>; // This accepts both single styles and style arrays
 };
 
 type ViewMode = 'days' | 'months' | 'years';
 
 export const DateTimePicker: React.FC<DateTimePickerProps> = ({ 
+  style,
   onDateChange, 
   initialDate = new Date() 
 }) => {
@@ -272,7 +275,7 @@ export const DateTimePicker: React.FC<DateTimePickerProps> = ({
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, style]}>
       <View style={styles.inputRow}>
         <Feather name="clock" size={24} color="#888" style={styles.icon} />
         
