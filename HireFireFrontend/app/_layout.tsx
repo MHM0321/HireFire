@@ -72,6 +72,10 @@ export default function Layout() {
           name="earningsPg"
           options={{ headerShown: false }} 
         />
+        <Stack.Screen 
+          name="consultantPg"
+          options={{ headerShown: false }} 
+        />
       </Stack>
     </ThemeProvider>
   );
