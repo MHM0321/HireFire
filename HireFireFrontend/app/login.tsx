@@ -1,116 +1,178 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ImageBackground } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import { useRouter } from 'expo-router';
 
 const Login = () => {
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
+  const router = useRouter();
 
-  const handleLogin = () => {
-    if (!email || !password) {
-      Alert.alert('Error', 'Please fill all fields');
+  const handleLogin = async () => {
+    // Reset messages
+    setErrorMessage('');
+    setSuccessMessage('');
+  
+    // Validate inputs
+    if (!username || !password) {
+      setErrorMessage('Please fill all fields');
       return;
     }
-
-    // Handle login logic here (e.g., API call)
-    Alert.alert('Success', 'Logged in successfully!');
+  
+    const apiUrl = 'http://localhost:8080/api/auth/login';
+    const userData = {
+      name: username.trim(), // Use "name" instead of "username"
+      password: password,
+    };
+  
+    try {
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(userData),
+      });
+  
+      const data = await response.json();
+  
+      if (!response.ok) {
+        setErrorMessage(data.message || 'Login failed');
+        Alert.alert('Error', data.message || 'Login failed');
+        return;
+      }
+  
+      setSuccessMessage('Logged in successfully!');
+      Alert.alert('Success', 'Logged in successfully!', [
+        {
+          text: 'OK',
+          onPress: () => router.replace('/customerPg'), // Navigate to customer page
+        },
+      ]);
+  
+      // Clear form after successful login
+      setUsername('');
+      setPassword('');
+    } catch (error) {
+      setErrorMessage('An unexpected error occurred');
+      Alert.alert('Error', 'An unexpected error occurred');
+    }
   };
 
   return (
-    <LinearGradient
-      colors={['#FF4D4D', '#FF8080']}
-      style={styles.gradient}
-    >
-      <View style={styles.container}>
-        <Text style={styles.title}>Welcome Back!</Text>
-        <Text style={styles.subtitle}>Login to your account</Text>
+    <View style={styles.container}>
+      <Text style={styles.title}>Login</Text>
 
-        <TextInput
-          style={styles.input}
-          placeholder="Email"
-          placeholderTextColor="#aaa"
-          value={email}
-          onChangeText={setEmail}
-          keyboardType="email-address"
-          autoCapitalize="none"
-        />
+      {/* Display error message if there is one */}
+      {errorMessage ? (
+        <View style={styles.messageContainer}>
+          <Text style={styles.errorText}>{errorMessage}</Text>
+        </View>
+      ) : null}
 
-        <TextInput
-          style={styles.input}
-          placeholder="Password"
-          placeholderTextColor="#aaa"
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-        />
+      {/* Display success message if there is one */}
+      {successMessage ? (
+        <View style={styles.messageContainer}>
+          <Text style={styles.successText}>{successMessage}</Text>
+        </View>
+      ) : null}
 
-        <TouchableOpacity style={styles.button} onPress={handleLogin}>
-          <Text style={styles.buttonText}>Login</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Username"
+        value={username}
+        onChangeText={setUsername}
+      />
+
+      <TextInput
+        style={styles.input}
+        placeholder="Password"
+        value={password}
+        onChangeText={setPassword}
+        secureTextEntry
+      />
+
+      <TouchableOpacity style={styles.button} onPress={handleLogin}>
+        <Text style={styles.buttonText}>Login</Text>
+      </TouchableOpacity>
+
+      {/* Signup redirect section */}
+      <View style={styles.signupContainer}>
+        <Text style={styles.signupText}>Don't have an account? </Text>
+        <TouchableOpacity onPress={() => router.push('/signUP')}>
+          <Text style={styles.signupLink}>Sign Up</Text>
         </TouchableOpacity>
-
-        <Text style={styles.footerText}>
-          Don't have an account?{' '}
-          <Text style={styles.link} onPress={() => Alert.alert('Redirect', 'Go to Signup')}>
-            Sign Up
-          </Text>
-        </Text>
       </View>
-    </LinearGradient>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  gradient: {
-    flex: 1,
-  },
   container: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
+    backgroundColor: '#f9f9f9',
   },
   title: {
-    fontSize: 32,
+    fontSize: 24,
     fontWeight: 'bold',
-    color: '#fff',
-    marginBottom: 10,
+    marginBottom: 20,
   },
-  subtitle: {
-    fontSize: 18,
-    color: '#fff',
-    marginBottom: 30,
+  messageContainer: {
+    width: '100%',
+    padding: 10,
+    borderRadius: 8,
+    marginBottom: 15,
+  },
+  errorText: {
+    color: '#d9534f', // Red color for errors
+    textAlign: 'center',
+    fontWeight: '500',
+  },
+  successText: {
+    color: '#5cb85c', // Green color for success
+    textAlign: 'center',
+    fontWeight: '500',
   },
   input: {
     width: '100%',
     height: 50,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    borderRadius: 25,
-    paddingHorizontal: 20,
-    marginBottom: 20,
-    color: '#fff',
-    fontSize: 16,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    marginBottom: 15,
+    backgroundColor: '#fff',
   },
   button: {
     width: '100%',
     height: 50,
-    backgroundColor: '#fff',
+    backgroundColor: '#007BFF',
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 25,
-    marginTop: 10,
+    borderRadius: 8,
   },
   buttonText: {
-    color: '#FF4D4D',
+    color: '#fff',
     fontSize: 18,
     fontWeight: 'bold',
   },
-  footerText: {
-    color: '#fff',
+  signupContainer: {
+    flexDirection: 'row',
     marginTop: 20,
-    fontSize: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  link: {
-    color: '#fff',
+  signupText: {
+    fontSize: 16,
+    color: '#333',
+  },
+  signupLink: {
+    fontSize: 16,
+    color: '#007BFF',
     fontWeight: 'bold',
     textDecorationLine: 'underline',
   },

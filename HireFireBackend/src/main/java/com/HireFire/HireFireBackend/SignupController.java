@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -29,18 +30,18 @@ public class SignupController {
     @PostConstruct
     public void initializeDatabase() {
         try (Connection conn = getConnection()) {
-            String createTableSQL = "CREATE TABLE IF NOT EXISTS users (" +
-                    "id INTEGER PRIMARY KEY AUTOINCREMENT," +
-                    "name TEXT NOT NULL," +
-                    "email TEXT UNIQUE NOT NULL," +
-                    "password TEXT NOT NULL," +
-                    "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)";
+            String createUserTableSQL =
+                    "CREATE TABLE IF NOT EXISTS users (" +
+                            "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                            "name TEXT NOT NULL," +
+                            "email TEXT NOT NULL UNIQUE," +
+                            "password TEXT NOT NULL)";
 
-            try (PreparedStatement stmt = conn.prepareStatement(createTableSQL)) {
-                stmt.execute();
+            try (PreparedStatement pstmt = conn.prepareStatement(createUserTableSQL)) {
+                pstmt.executeUpdate();
             }
         } catch (SQLException e) {
-            System.err.println("Error initializing database: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -86,110 +87,75 @@ public class SignupController {
     // Signup endpoint to handle user registration
     @PostMapping("/signup")
     public ResponseEntity<ApiResponse> registerUser(@RequestBody SignupRequest signupRequest) {
-        // Check for required fields
-        if (signupRequest.getName() == null || signupRequest.getEmail() == null ||
-                signupRequest.getPassword() == null || signupRequest.getName().isEmpty() ||
-                signupRequest.getEmail().isEmpty() || signupRequest.getPassword().isEmpty()) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(new ApiResponse(false, "Please provide all required fields"));
-        }
-
-        // Hash the password before storing it
-        String hashedPassword;
         try {
-            hashedPassword = hashPassword(signupRequest.getPassword());
-        } catch (NoSuchAlgorithmException e) {
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new ApiResponse(false, "Error processing password"));
-        }
+            // Validate input
+            if (signupRequest.getName() == null || signupRequest.getName().trim().isEmpty()) {
+                return ResponseEntity.badRequest().body(new ApiResponse(false, "Name is required"));
+            }
 
-        // Store user in database
-        try (Connection conn = getConnection()) {
-            String insertSQL = "INSERT INTO users (name, email, password) VALUES (?, ?, ?)";
+            if (signupRequest.getEmail() == null || signupRequest.getEmail().trim().isEmpty()) {
+                return ResponseEntity.badRequest().body(new ApiResponse(false, "Email is required"));
+            }
 
-            try (PreparedStatement pstmt = conn.prepareStatement(insertSQL)) {
-                pstmt.setString(1, signupRequest.getName());
-                pstmt.setString(2, signupRequest.getEmail());
-                pstmt.setString(3, hashedPassword);
+            if (signupRequest.getPassword() == null || signupRequest.getPassword().trim().isEmpty()) {
+                return ResponseEntity.badRequest().body(new ApiResponse(false, "Password is required"));
+            }
 
-                int rowsAffected = pstmt.executeUpdate();
-
-                if (rowsAffected > 0) {
-                    return ResponseEntity.ok(new ApiResponse(true, "User registered successfully"));
-                } else {
-                    return ResponseEntity
-                            .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                            .body(new ApiResponse(false, "Failed to register user"));
+            // Check if user already exists
+            try (Connection conn = getConnection()) {
+                String checkUserSQL = "SELECT COUNT(*) FROM users WHERE email = ?";
+                try (PreparedStatement pstmt = conn.prepareStatement(checkUserSQL)) {
+                    pstmt.setString(1, signupRequest.getEmail());
+                    ResultSet rs = pstmt.executeQuery();
+                    if (rs.next() && rs.getInt(1) > 0) {
+                        return ResponseEntity.status(HttpStatus.CONFLICT)
+                                .body(new ApiResponse(false, "User with this email already exists"));
+                    }
                 }
-            }
-        } catch (SQLException e) {
-            // Check for email uniqueness constraint violation
-            if (e.getMessage().contains("UNIQUE constraint failed: users.email")) {
-                return ResponseEntity
-                        .badRequest()
-                        .body(new ApiResponse(false, "Email already registered"));
-            }
 
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new ApiResponse(false, "Database error: " + e.getMessage()));
-        }
-    }
+                // Hash the password
+                String hashedPassword = hashPassword(signupRequest.getPassword());
 
-    // Login endpoint to handle user authentication
-    @PostMapping("/login")
-    public ResponseEntity<ApiResponse> loginUser(@RequestBody SignupRequest loginRequest) {
-        // Check required fields
-        if (loginRequest.getEmail() == null || loginRequest.getPassword() == null ||
-                loginRequest.getEmail().isEmpty() || loginRequest.getPassword().isEmpty()) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(new ApiResponse(false, "Please provide email and password"));
-        }
+                // Insert the new user
+                String insertUserSQL = "INSERT INTO users (name, email, password) VALUES (?, ?, ?)";
+                try (PreparedStatement pstmt = conn.prepareStatement(insertUserSQL)) {
+                    pstmt.setString(1, signupRequest.getName());
+                    pstmt.setString(2, signupRequest.getEmail());
+                    pstmt.setString(3, hashedPassword);
 
-        // Hash the provided password to compare with stored hash
-        String hashedPassword;
-        try {
-            hashedPassword = hashPassword(loginRequest.getPassword());
-        } catch (NoSuchAlgorithmException e) {
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new ApiResponse(false, "Error processing password"));
-        }
-
-        // Check credentials against database
-        try (Connection conn = getConnection()) {
-            String query = "SELECT * FROM users WHERE email = ? AND password = ?";
-
-            try (PreparedStatement pstmt = conn.prepareStatement(query)) {
-                pstmt.setString(1, loginRequest.getEmail());
-                pstmt.setString(2, hashedPassword);
-
-                try (var resultSet = pstmt.executeQuery()) {
-                    if (resultSet.next()) {
-                        // User found, login successful
-                        return ResponseEntity.ok(new ApiResponse(true, "Login successful"));
+                    int affectedRows = pstmt.executeUpdate();
+                    if (affectedRows > 0) {
+                        return ResponseEntity.ok(new ApiResponse(true, "User registered successfully"));
                     } else {
-                        // No user found with matching credentials
-                        return ResponseEntity
-                                .status(HttpStatus.UNAUTHORIZED)
-                                .body(new ApiResponse(false, "Invalid email or password"));
+                        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                .body(new ApiResponse(false, "Failed to register user"));
                     }
                 }
             }
         } catch (SQLException e) {
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new ApiResponse(false, "Database error: " + e.getMessage()));
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ApiResponse(false, "Error hashing password"));
         }
     }
 
     // Helper method to hash passwords
     private String hashPassword(String password) throws NoSuchAlgorithmException {
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
-        byte[] hash = digest.digest(password.getBytes(StandardCharsets.UTF_8));
-        return String.format("%064x", new java.math.BigInteger(1, hash));
+        byte[] encodedHash = digest.digest(
+                password.getBytes(StandardCharsets.UTF_8));
+
+        StringBuilder hexString = new StringBuilder();
+        for (byte b : encodedHash) {
+            String hex = Integer.toHexString(0xff & b);
+            if (hex.length() == 1) hexString.append('0');
+            hexString.append(hex);
+        }
+
+        return hexString.toString();
     }
 }
