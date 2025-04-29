@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Switch } from 'react-native';
 import { useRouter } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons'; // Import Ionicons from Expo
 
 const Login = () => {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [isWorker, setIsWorker] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
+  const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
   const router = useRouter();
 
   const handleLogin = async () => {
@@ -15,14 +18,18 @@ const Login = () => {
     setSuccessMessage('');
   
     // Validate inputs
-    if (!username || !password) {
+    if (!email || !password) {
       setErrorMessage('Please fill all fields');
       return;
     }
   
-    const apiUrl = 'http://localhost:8080/api/auth/login';
+    // Choose the appropriate API endpoint based on account type
+    const apiUrl = isWorker 
+      ? 'http://192.168.0.8:8080/api/auth/worker/login' 
+      : 'http://192.168.0.8:8080/api/auth/login';
+    
     const userData = {
-      name: username.trim(), // Use "name" instead of "username"
+      email: email.trim(),
       password: password,
     };
   
@@ -44,20 +51,29 @@ const Login = () => {
       }
   
       setSuccessMessage('Logged in successfully!');
+      
+      // Navigate to appropriate page based on account type
+      const destination = isWorker ? '/workerDashboard' : '/customerPg';
+      
       Alert.alert('Success', 'Logged in successfully!', [
         {
           text: 'OK',
-          onPress: () => router.replace('/customerPg'), // Navigate to customer page
+          onPress: () => router.replace(destination as any),
         },
       ]);
   
       // Clear form after successful login
-      setUsername('');
+      setEmail('');
       setPassword('');
     } catch (error) {
       setErrorMessage('An unexpected error occurred');
       Alert.alert('Error', 'An unexpected error occurred');
     }
+  };
+
+  // Toggle password visibility
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
   };
 
   return (
@@ -80,18 +96,44 @@ const Login = () => {
 
       <TextInput
         style={styles.input}
-        placeholder="Username"
-        value={username}
-        onChangeText={setUsername}
+        placeholder="Email"
+        value={email}
+        onChangeText={setEmail}
+        keyboardType="email-address"
+        autoCapitalize="none"
       />
 
-      <TextInput
-        style={styles.input}
-        placeholder="Password"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-      />
+      {/* Password input with show/hide toggle */}
+      <View style={styles.passwordContainer}>
+        <TextInput
+          style={styles.passwordInput}
+          placeholder="Password"
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry={!showPassword}
+        />
+        <TouchableOpacity 
+          style={styles.eyeIcon} 
+          onPress={togglePasswordVisibility}
+        >
+          <Ionicons 
+            name={showPassword ? "eye-off" : "eye"} 
+            size={24} 
+            color="#666"
+          />
+        </TouchableOpacity>
+      </View>
+
+      {/* Worker account toggle */}
+      <View style={styles.switchContainer}>
+        <Text>Login as a Worker</Text>
+        <Switch
+          value={isWorker}
+          onValueChange={setIsWorker}
+          trackColor={{ false: "#767577", true: "#4caf50" }}
+          thumbColor={isWorker ? "#8bc34a" : "#f4f3f4"}
+        />
+      </View>
 
       <TouchableOpacity style={styles.button} onPress={handleLogin}>
         <Text style={styles.buttonText}>Login</Text>
@@ -147,6 +189,32 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     backgroundColor: '#fff',
   },
+  passwordContainer: {
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 15,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    backgroundColor: '#fff',
+  },
+  passwordInput: {
+    flex: 1,
+    height: 50,
+    paddingHorizontal: 10,
+  },
+  eyeIcon: {
+    padding: 10,
+  },
+  switchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '100%',
+    marginBottom: 20,
+    paddingHorizontal: 10,
+  },
   button: {
     width: '100%',
     height: 50,
@@ -157,24 +225,19 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: '#fff',
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: 'bold',
   },
   signupContainer: {
     flexDirection: 'row',
     marginTop: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   signupText: {
-    fontSize: 16,
     color: '#333',
   },
   signupLink: {
-    fontSize: 16,
     color: '#007BFF',
     fontWeight: 'bold',
-    textDecorationLine: 'underline',
   },
 });
 

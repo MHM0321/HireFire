@@ -1,82 +1,91 @@
 import axios from 'axios';
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
-import { useRouter } from 'expo-router'; // Import useRouter for navigation
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Switch } from 'react-native';
+import { useRouter } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons'; // Import Ionicons from Expo
 
 const Signup = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [isWorker, setIsWorker] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
-  const router = useRouter(); // Initialize router for navigation
+  // States to toggle password visibility
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const router = useRouter();
 
   const handleSignup = async () => {
     // Reset messages
     setErrorMessage('');
     setSuccessMessage('');
-    
+
     // Validate inputs
     if (!name || !email || !password || !confirmPassword) {
       setErrorMessage('Please fill all fields');
       return;
     }
-    
+
     if (password !== confirmPassword) {
       setErrorMessage('Passwords do not match');
       return;
     }
-    
-    const apiUrl = 'http://localhost:8080/api/auth/signup';
+
+    //Use different API endpoints based on whether signing up as worker or user
+    const apiUrl = isWorker
+        ? 'http://192.168.0.8:8080/api/auth/worker/signup'
+        : 'http://192.168.0.8:8080/api/auth/signup';
+
     const userData = {
       name: name,
       email: email.toLowerCase(),
       password: password,
+      isWorker: isWorker,
     };
-    
+
     try {
       const response = await axios.post(apiUrl, userData);
-      setSuccessMessage(response.data.message || 'Account created successfully!');
-      
-      // Show alert in addition to the in-component message
+      const accountType = isWorker ? 'Worker' : 'User';
+      setSuccessMessage(response.data.message || `${accountType} account created successfully!`);
+
       Alert.alert(
-        'Success', 
-        response.data.message || 'Account created successfully!',
-        [
-          { 
-            text: 'Login Now', 
-            onPress: () => router.push('/login') // Navigate to login page
-          },
-          { 
-            text: 'OK' 
-          }
-        ]
+          'Success',
+          response.data.message || `${accountType} account created successfully!`,
+          [
+            {
+              text: 'Login Now',
+              onPress: () => router.push(isWorker ? ('/worker/login' as any) : '/login')
+            },
+            {
+              text: 'OK'
+            }
+          ]
       );
-      
+
       // Clear form after successful signup
       setName('');
       setEmail('');
       setPassword('');
       setConfirmPassword('');
+      setIsWorker(false);
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
-        // Handle specific error codes
         if (error.response.status === 409) {
-          // Email already exists
-          setErrorMessage('This email is already registered');
-          
-          // Show alert with option to go to login
+          const accountType = isWorker ? 'worker' : 'user';
+          setErrorMessage(`This email is already registered as a ${accountType}`);
+
           Alert.alert(
-            'Email Already Exists', 
-            'This email is already registered. Would you like to login instead?',
-            [
-              { text: 'Cancel' },
-              { 
-                text: 'Go to Login', 
-                onPress: () => router.push('/login') // Navigate to login page
-              }
-            ]
+              'Email Already Exists',
+              `This email is already registered as a ${accountType}. Would you like to login instead?`,
+              [
+                { text: 'Cancel' },
+                {
+                  text: 'Go to Login',
+                  onPress: () => router.push(isWorker ? ('/worker/login' as any) : '/login')
+                }
+              ]
           );
         } else {
           setErrorMessage(error.response.data.message || 'Registration failed');
@@ -92,73 +101,119 @@ const Signup = () => {
     }
   };
 
-  // Handler to navigate to login page
+  // Handler to navigate to appropriate login page
   const goToLogin = () => {
-    router.push('/login');
+    router.push(isWorker ? ('/worker/login' as any) : '/login');
+  };
+
+  // Toggle password visibility handlers
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
+  const toggleConfirmPasswordVisibility = () => {
+    setShowConfirmPassword(!showConfirmPassword);
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Sign Up</Text>
-      
-      {/* Display error message if there is one */}
-      {errorMessage ? (
-        <View style={styles.messageContainer}>
-          <Text style={styles.errorText}>{errorMessage}</Text>
+      <View style={styles.container}>
+        <Text style={styles.title}>Sign Up</Text>
+
+        {/* Display error message if there is one */}
+        {errorMessage ? (
+            <View style={styles.messageContainer}>
+              <Text style={styles.errorText}>{errorMessage}</Text>
+            </View>
+        ) : null}
+
+        {/* Display success message if there is one */}
+        {successMessage ? (
+            <View style={styles.messageContainer}>
+              <Text style={styles.successText}>{successMessage}</Text>
+            </View>
+        ) : null}
+
+        <TextInput
+            style={styles.input}
+            placeholder="Name"
+            value={name}
+            onChangeText={setName}
+        />
+
+        <TextInput
+            style={styles.input}
+            placeholder="Email"
+            value={email}
+            onChangeText={setEmail}
+            keyboardType="email-address"
+            autoCapitalize="none"
+        />
+
+        {/* Password input with show/hide toggle */}
+        <View style={styles.passwordContainer}>
+          <TextInput
+              style={styles.passwordInput}
+              placeholder="Password"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry={!showPassword}
+          />
+          <TouchableOpacity 
+              style={styles.eyeIcon} 
+              onPress={togglePasswordVisibility}
+          >
+            <Ionicons 
+                name={showPassword ? "eye-off" : "eye"} 
+                size={24} 
+                color="#666"
+            />
+          </TouchableOpacity>
         </View>
-      ) : null}
-      
-      {/* Display success message if there is one */}
-      {successMessage ? (
-        <View style={styles.messageContainer}>
-          <Text style={styles.successText}>{successMessage}</Text>
+
+        {/* Confirm Password input with show/hide toggle */}
+        <View style={styles.passwordContainer}>
+          <TextInput
+              style={styles.passwordInput}
+              placeholder="Confirm Password"
+              value={confirmPassword}
+              onChangeText={setConfirmPassword}
+              secureTextEntry={!showConfirmPassword}
+          />
+          <TouchableOpacity 
+              style={styles.eyeIcon} 
+              onPress={toggleConfirmPasswordVisibility}
+          >
+            <Ionicons 
+                name={showConfirmPassword ? "eye-off" : "eye"} 
+                size={24} 
+                color="#666"
+            />
+          </TouchableOpacity>
         </View>
-      ) : null}
 
-      <TextInput
-        style={styles.input}
-        placeholder="Name"
-        value={name}
-        onChangeText={setName}
-      />
+        {/* Worker account toggle */}
+        <View style={styles.switchContainer}>
+          <Text>Sign up as a Worker</Text>
+          <Switch
+              value={isWorker}
+              onValueChange={setIsWorker}
+              trackColor={{ false: "#767577", true: "#4caf50" }}
+              thumbColor={isWorker ? "#8bc34a" : "#f4f3f4"}
+          />
+        </View>
 
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        value={email}
-        onChangeText={setEmail}
-        keyboardType="email-address"
-        autoCapitalize="none"
-      />
-
-      <TextInput
-        style={styles.input}
-        placeholder="Password"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-      />
-
-      <TextInput
-        style={styles.input}
-        placeholder="Confirm Password"
-        value={confirmPassword}
-        onChangeText={setConfirmPassword}
-        secureTextEntry
-      />
-
-      <TouchableOpacity style={styles.button} onPress={handleSignup}>
-        <Text style={styles.buttonText}>Sign Up</Text>
-      </TouchableOpacity>
-      
-      {/* Login redirect section */}
-      <View style={styles.loginContainer}>
-        <Text style={styles.loginText}>Already have an account? </Text>
-        <TouchableOpacity onPress={goToLogin}>
-          <Text style={styles.loginLink}>Login</Text>
+        <TouchableOpacity style={styles.button} onPress={handleSignup}>
+          <Text style={styles.buttonText}>Sign Up</Text>
         </TouchableOpacity>
+
+        {/* Login redirect section */}
+        <View style={styles.loginContainer}>
+          <Text style={styles.loginText}>Already have an account? </Text>
+          <TouchableOpacity onPress={goToLogin}>
+            <Text style={styles.loginLink}>Login</Text>
+          </TouchableOpacity>
+        </View>
       </View>
-    </View>
   );
 };
 
@@ -182,12 +237,12 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   errorText: {
-    color: '#d9534f',  // Red color for errors
+    color: '#d9534f',
     textAlign: 'center',
     fontWeight: '500',
   },
   successText: {
-    color: '#5cb85c',  // Green color for success
+    color: '#5cb85c',
     textAlign: 'center',
     fontWeight: '500',
   },
@@ -201,6 +256,32 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     backgroundColor: '#fff',
   },
+  passwordContainer: {
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 15,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    backgroundColor: '#fff',
+  },
+  passwordInput: {
+    flex: 1,
+    height: 50,
+    paddingHorizontal: 10,
+  },
+  eyeIcon: {
+    padding: 10,
+  },
+  switchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '100%',
+    marginBottom: 20,
+    paddingHorizontal: 10,
+  },
   button: {
     width: '100%',
     height: 50,
@@ -211,24 +292,19 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: '#fff',
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: 'bold',
   },
   loginContainer: {
     flexDirection: 'row',
     marginTop: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   loginText: {
-    fontSize: 16,
     color: '#333',
   },
   loginLink: {
-    fontSize: 16,
     color: '#007BFF',
     fontWeight: 'bold',
-    textDecorationLine: 'underline',
   },
 });
 

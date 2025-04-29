@@ -19,29 +19,50 @@ import java.nio.charset.StandardCharsets;
 @CrossOrigin(origins = "*") // Allow requests from React Native frontend
 public class SignupController {
 
-    private static final String DB_URL = "jdbc:sqlite:D:/UNIVERSITY DATA/Semester 4/Assignments/SDA/Project/Code/Database/HireFire";
+    private static final String DB_URL = "jdbc:sqlite:HireFire.db";
 
     // Create a method to establish database connection
     private Connection getConnection() throws SQLException {
-        return DriverManager.getConnection(DB_URL);
+        Connection conn = DriverManager.getConnection(DB_URL);
+        return conn;
     }
 
     // Method to initialize the database (create tables if they don't exist)
     @PostConstruct
     public void initializeDatabase() {
         try (Connection conn = getConnection()) {
+            // Create users table
             String createUserTableSQL =
                     "CREATE TABLE IF NOT EXISTS users (" +
                             "id INTEGER PRIMARY KEY AUTOINCREMENT," +
                             "name TEXT NOT NULL," +
                             "email TEXT NOT NULL UNIQUE," +
-                            "password TEXT NOT NULL)";
+                            "password TEXT NOT NULL," +
+                            "is_worker BOOLEAN NOT NULL DEFAULT 0" +
+                            ")";
 
-            try (PreparedStatement pstmt = conn.prepareStatement(createUserTableSQL)) {
-                pstmt.executeUpdate();
+            // Create workers table
+            String createWorkerTableSQL =
+                    "CREATE TABLE IF NOT EXISTS workers (" +
+                            "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                            "name TEXT NOT NULL," +
+                            "email TEXT NOT NULL UNIQUE," +
+                            "password TEXT NOT NULL," +
+                            "skills TEXT," +
+                            "experience TEXT," +
+                            "hourly_rate REAL" +
+                            ")";
+
+            try (PreparedStatement userStmt = conn.prepareStatement(createUserTableSQL);
+                 PreparedStatement workerStmt = conn.prepareStatement(createWorkerTableSQL)) {
+
+                userStmt.executeUpdate();
+                workerStmt.executeUpdate();
+
+                System.out.println("Database tables created successfully");
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("Error initializing database: " + e.getMessage());
         }
     }
 
@@ -51,6 +72,7 @@ public class SignupController {
         private String email;
         private String password;
         private String currentPassword;
+        private boolean isWorker; // New field to identify worker signup
 
         // Getters and setters
         public String getName() { return name; }
@@ -64,6 +86,9 @@ public class SignupController {
 
         public String getCurrentPassword() { return currentPassword; }
         public void setCurrentPassword(String currentPassword) { this.currentPassword = currentPassword; }
+
+        public boolean isWorker() { return isWorker; }
+        public void setWorker(boolean isWorker) { this.isWorker = isWorker; }
     }
 
     // Response DTO
@@ -84,78 +109,116 @@ public class SignupController {
         public void setMessage(String message) { this.message = message; }
     }
 
-    // Signup endpoint to handle user registration
+    // User signup endpoint - only registers users
     @PostMapping("/signup")
     public ResponseEntity<ApiResponse> registerUser(@RequestBody SignupRequest signupRequest) {
         try {
-            // Validate input
-            if (signupRequest.getName() == null || signupRequest.getName().trim().isEmpty()) {
-                return ResponseEntity.badRequest().body(new ApiResponse(false, "Name is required"));
-            }
-
-            if (signupRequest.getEmail() == null || signupRequest.getEmail().trim().isEmpty()) {
-                return ResponseEntity.badRequest().body(new ApiResponse(false, "Email is required"));
-            }
-
-            if (signupRequest.getPassword() == null || signupRequest.getPassword().trim().isEmpty()) {
-                return ResponseEntity.badRequest().body(new ApiResponse(false, "Password is required"));
-            }
-
-            // Check if user already exists
+            // Check if the email already exists in either table
             try (Connection conn = getConnection()) {
-                String checkUserSQL = "SELECT COUNT(*) FROM users WHERE email = ?";
-                try (PreparedStatement pstmt = conn.prepareStatement(checkUserSQL)) {
-                    pstmt.setString(1, signupRequest.getEmail());
-                    ResultSet rs = pstmt.executeQuery();
+                // Check in users table
+                String checkUserEmailSql = "SELECT COUNT(*) FROM users WHERE email = ?";
+                try (PreparedStatement stmt = conn.prepareStatement(checkUserEmailSql)) {
+                    stmt.setString(1, signupRequest.getEmail());
+                    ResultSet rs = stmt.executeQuery();
                     if (rs.next() && rs.getInt(1) > 0) {
                         return ResponseEntity.status(HttpStatus.CONFLICT)
-                                .body(new ApiResponse(false, "User with this email already exists"));
+                                .body(new ApiResponse(false, "Email already registered as a user"));
+                    }
+                }
+
+                // Check in workers table
+                String checkWorkerEmailSql = "SELECT COUNT(*) FROM workers WHERE email = ?";
+                try (PreparedStatement stmt = conn.prepareStatement(checkWorkerEmailSql)) {
+                    stmt.setString(1, signupRequest.getEmail());
+                    ResultSet rs = stmt.executeQuery();
+                    if (rs.next() && rs.getInt(1) > 0) {
+                        return ResponseEntity.status(HttpStatus.CONFLICT)
+                                .body(new ApiResponse(false, "Email already registered as a worker"));
                     }
                 }
 
                 // Hash the password
                 String hashedPassword = hashPassword(signupRequest.getPassword());
 
-                // Insert the new user
-                String insertUserSQL = "INSERT INTO users (name, email, password) VALUES (?, ?, ?)";
-                try (PreparedStatement pstmt = conn.prepareStatement(insertUserSQL)) {
-                    pstmt.setString(1, signupRequest.getName());
-                    pstmt.setString(2, signupRequest.getEmail());
-                    pstmt.setString(3, hashedPassword);
+                // Insert into users table (always - this is the user signup endpoint)
+                String insertUserSql = "INSERT INTO users (name, email, password, is_worker) VALUES (?, ?, ?, ?)";
+                try (PreparedStatement stmt = conn.prepareStatement(insertUserSql)) {
+                    stmt.setString(1, signupRequest.getName());
+                    stmt.setString(2, signupRequest.getEmail());
+                    stmt.setString(3, hashedPassword);
+                    stmt.setBoolean(4, false); // Regular user
+                    stmt.executeUpdate();
+                }
+                return ResponseEntity.ok(new ApiResponse(true, "User registered successfully"));
+            }
+        } catch (SQLException | NoSuchAlgorithmException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ApiResponse(false, "Registration failed: " + e.getMessage()));
+        }
+    }
 
-                    int affectedRows = pstmt.executeUpdate();
-                    if (affectedRows > 0) {
-                        return ResponseEntity.ok(new ApiResponse(true, "User registered successfully"));
-                    } else {
-                        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                .body(new ApiResponse(false, "Failed to register user"));
+    // Worker-specific signup endpoint
+    @PostMapping("/worker/signup")
+    public ResponseEntity<ApiResponse> registerWorker(@RequestBody SignupRequest signupRequest) {
+        try {
+            // Check if the email already exists in either table
+            try (Connection conn = getConnection()) {
+                // Check in users table
+                String checkUserEmailSql = "SELECT COUNT(*) FROM users WHERE email = ?";
+                try (PreparedStatement stmt = conn.prepareStatement(checkUserEmailSql)) {
+                    stmt.setString(1, signupRequest.getEmail());
+                    ResultSet rs = stmt.executeQuery();
+                    if (rs.next() && rs.getInt(1) > 0) {
+                        return ResponseEntity.status(HttpStatus.CONFLICT)
+                                .body(new ApiResponse(false, "Email already registered as a user"));
                     }
                 }
+
+                // Check in workers table
+                String checkWorkerEmailSql = "SELECT COUNT(*) FROM workers WHERE email = ?";
+                try (PreparedStatement stmt = conn.prepareStatement(checkWorkerEmailSql)) {
+                    stmt.setString(1, signupRequest.getEmail());
+                    ResultSet rs = stmt.executeQuery();
+                    if (rs.next() && rs.getInt(1) > 0) {
+                        return ResponseEntity.status(HttpStatus.CONFLICT)
+                                .body(new ApiResponse(false, "Email already registered as a worker"));
+                    }
+                }
+
+                // Hash the password
+                String hashedPassword = hashPassword(signupRequest.getPassword());
+
+                // Insert into workers table (always - this is the worker signup endpoint)
+                String insertWorkerSql = "INSERT INTO workers (name, email, password) VALUES (?, ?, ?)";
+                try (PreparedStatement stmt = conn.prepareStatement(insertWorkerSql)) {
+                    stmt.setString(1, signupRequest.getName());
+                    stmt.setString(2, signupRequest.getEmail());
+                    stmt.setString(3, hashedPassword);
+                    stmt.executeUpdate();
+                }
+                return ResponseEntity.ok(new ApiResponse(true, "Worker registered successfully"));
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
+        } catch (SQLException | NoSuchAlgorithmException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new ApiResponse(false, "Database error: " + e.getMessage()));
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new ApiResponse(false, "Error hashing password"));
+                    .body(new ApiResponse(false, "Worker registration failed: " + e.getMessage()));
         }
     }
 
     // Helper method to hash passwords
     private String hashPassword(String password) throws NoSuchAlgorithmException {
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
-        byte[] encodedHash = digest.digest(
-                password.getBytes(StandardCharsets.UTF_8));
+        byte[] encodedHash = digest.digest(password.getBytes(StandardCharsets.UTF_8));
 
         StringBuilder hexString = new StringBuilder();
         for (byte b : encodedHash) {
             String hex = Integer.toHexString(0xff & b);
-            if (hex.length() == 1) hexString.append('0');
+            if (hex.length() == 1) {
+                hexString.append('0');
+            }
             hexString.append(hex);
         }
 
         return hexString.toString();
     }
+
 }
