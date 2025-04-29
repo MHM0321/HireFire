@@ -46,6 +46,11 @@ export default function Layout() {
           name="redButton" 
           options={{ headerShown: false }} 
         />
+        <Stack.Screen 
+          name="customerPg2"
+          options={{
+          headerTitle: '', }}
+        />
       </Stack>
     </ThemeProvider>
   );
