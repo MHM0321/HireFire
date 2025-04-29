@@ -1,34 +1,26 @@
-// customerPg.tsx
 import React, { useState } from 'react';
-import { StyleSheet, View, TextInput, TouchableOpacity, SafeAreaView, ScrollView } from 'react-native';
-import { useRouter } from 'expo-router';
-
-import { Feather } from '@expo/vector-icons';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { FontAwesome6 } from '@expo/vector-icons';
+import { StyleSheet, View, TextInput, TouchableOpacity, SafeAreaView, ScrollView, Text } from 'react-native';
+import { Link, useRouter } from 'expo-router';
+import { Feather, MaterialCommunityIcons, FontAwesome6 } from '@expo/vector-icons';
 import { Image } from 'react-native';
 import { DateTimePicker } from '@/components/DateTimePicker';
-
-
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-import { IconSymbol } from '@/components/ui/IconSymbol';
 
 const categories = [
-    { icon: 'zap', label: 'Electrician', lib: 'Feather' },
-    { icon: 'tool', label: 'Mechanic', lib: 'Feather' },
-    { icon: 'faucet-drip', label: 'Plumber', lib: 'FA' },
-    { icon: 'table-furniture', label: 'Carpenter', lib: 'Material' },
-    { icon: 'format-paint', label: 'Painter', lib: 'Material' },
-    { icon: 'account-hard-hat', label: 'Labourer', lib: 'Material' },
-    { icon: 'broom', label: 'Janitor', lib: 'FA' },
-    { icon: 'leaf', label: 'Gardener', lib: 'Material' },
-    { icon: 'utensils', label: 'Cook', lib: 'FA' },
-    { icon: 'wall', label: 'Mason', lib: 'Material' },
-    { icon: 'human-baby-changing-table', label: 'Baby Sitter', lib: 'Material' },
-    { icon: 'radiator', label: 'Gas Fitter', lib: 'Material' },
-  ];
-  
+  { icon: 'zap', label: 'Electrician', lib: 'Feather' },
+  { icon: 'tool', label: 'Mechanic', lib: 'Feather' },
+  { icon: 'faucet-drip', label: 'Plumber', lib: 'FA' },
+  { icon: 'table-furniture', label: 'Carpenter', lib: 'Material' },
+  { icon: 'format-paint', label: 'Painter', lib: 'Material' },
+  { icon: 'account-hard-hat', label: 'Labourer', lib: 'Material' },
+  { icon: 'broom', label: 'Janitor', lib: 'FA' },
+  { icon: 'leaf', label: 'Gardener', lib: 'Material' },
+  { icon: 'utensils', label: 'Cook', lib: 'FA' },
+  { icon: 'wall', label: 'Mason', lib: 'Material' },
+  { icon: 'human-baby-changing-table', label: 'Baby Sitter', lib: 'Material' },
+  { icon: 'radiator', label: 'Gas Fitter', lib: 'Material' },
+];
 
 export default function CustomerPgScreen() {
   const router = useRouter();
@@ -62,14 +54,12 @@ export default function CustomerPgScreen() {
   
   return (
     <SafeAreaView style={styles.container}>
-      {/* Header */}
+      {/* Header with Worker Link */}
       <View style={styles.header}>
-        {/* Left: Hamburger */}
-        <TouchableOpacity style={styles.leftContainer} onPress={() => console.log('Open drawer or menu')}>
+        <TouchableOpacity style={styles.leftContainer}>
           <Feather name="menu" size={24} color="#FFFFFF" />
         </TouchableOpacity>
-  
-        {/* Center: Logo */}
+
         <View style={styles.centerContainer}>
           <Image
             source={require('@/assets/images/logoText.png')}
@@ -77,13 +67,19 @@ export default function CustomerPgScreen() {
             resizeMode="contain"
           />
         </View>
-  
-        {/* Right: Profile */}
-        <TouchableOpacity style={styles.rightContainer} onPress={() => console.log('Go to profile')}>
-          <Feather name="user" size={24} color="#FFFFFF" />
-        </TouchableOpacity>
+
+// worker is linked here.
+        <View style={styles.rightContainer}>
+          <Link href="/workerPg" style={styles.workerLink}>
+            <Feather name="user-check" size={18} color="#FF4D4D" />
+            <Text style={styles.workerLinkText}>Worker</Text>
+          </Link>
+          <TouchableOpacity style={styles.profileButton}>
+            <Feather name="user" size={24} color="#FFFFFF" />
+          </TouchableOpacity>
+        </View>
       </View>
-  
+
       {/* Search Bar */}
       <View style={styles.searchContainer}>
         <View style={styles.searchBar}>
@@ -95,10 +91,9 @@ export default function CustomerPgScreen() {
           />
         </View>
       </View>
-  
-      <ScrollView style={styles.contentContainer}>
 
-        {/* DateTime */}
+      <ScrollView style={styles.contentContainer}>
+        {/* DateTime Picker */}
         <ThemedText style={styles.DTLabel}>Select Date and Time</ThemedText>
         <DateTimePicker 
           initialDate={selectedDate}
@@ -113,7 +108,7 @@ export default function CustomerPgScreen() {
         }}
       />
 
-        {/* Categories */}
+        {/* Categories Grid */}
         <View style={styles.categoriesContainer}>
           <ThemedText style={styles.sectionTitle}>Select Category</ThemedText>
           <View style={styles.gridContainer}>
@@ -175,7 +170,6 @@ export default function CustomerPgScreen() {
       )}
     </SafeAreaView>
   );
-  
 }
 
 const styles = StyleSheet.create({
@@ -190,43 +184,62 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 38,
     backgroundColor: '#1A0D0E',
-    position: 'relative',
   },
-  
   leftContainer: {
-    width: 70,
-    paddingTop: 20,
-    alignItems: 'flex-start',
-    justifyContent: 'center',
+    width: 40,
   },
-  
   centerContainer: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    paddingTop: 30,
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  
   rightContainer: {
-    width: 70,
-    paddingTop: 20,
-    alignItems: 'flex-end',
-    justifyContent: 'center',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  workerLink: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    backgroundColor: '#1A0D0E',
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#FF4D4D',
+  },
+  workerLinkText: {
+    color: '#FF4D4D',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  profileButton: {
+    padding: 4,
   },
   logoImage: {
     width: 120,
     height: 60,
   },
-  contentHeader: {
-    backgroundColor: '#F5F0F0',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
+  searchContainer: {
+    paddingHorizontal: 16,
+    paddingBottom: 18,
+    backgroundColor: '#1A0D0E',
   },
-  contentHeaderText: {
-    fontSize: 18,
-    fontWeight: 'bold',
+  searchBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F5F0F0',
+    borderRadius: 24,
+    paddingHorizontal: 16,
+    paddingVertical: 3,
+  },
+  searchIcon: {
+    marginRight: 8,
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: 16,
     color: '#333333',
   },
   contentContainer: {
@@ -237,12 +250,9 @@ const styles = StyleSheet.create({
     paddingBottom: 80, // Add padding at bottom for the next button
   },
   categoriesContainer: {
-    backgroundColor: '#F5F0F0',
-    paddingHorizontal: 20,
     paddingTop: 16,
   },
   sectionTitle: {
-    marginTop: 8,
     fontSize: 18,
     fontWeight: 'bold',
     color: '#333333',
@@ -284,27 +294,6 @@ const styles = StyleSheet.create({
   selectedCategoryText: {
     color: '#FFFFFF',
     fontWeight: '600',
-  },
-  searchContainer: {
-    paddingHorizontal: 16,
-    paddingBottom: 18,
-    backgroundColor: '#1A0D0E',
-  },
-  searchBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#F5F0F0',
-    borderRadius: 24,
-    paddingHorizontal: 16,
-    paddingVertical: 3,
-  },
-  searchIcon: {
-    marginRight: 8,
-  },
-  searchInput: {
-    flex: 1,
-    fontSize: 16,
-    color: '#333333',
   },
   dateTimeContainer: {
     backgroundColor: '#F5F0F0',

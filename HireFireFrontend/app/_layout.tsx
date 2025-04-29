@@ -3,6 +3,7 @@ import { Stack } from 'expo-router';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useColorScheme } from 'react-native';
 
+// Define custom dark and light themes
 const CustomDarkTheme = {
   ...DarkTheme,
   colors: {
@@ -27,13 +28,14 @@ const CustomLightTheme = {
   },
 };
 
-
+// Main Layout function
 export default function Layout() {
-  const colorScheme = 'dark';
-  
+  const colorScheme = useColorScheme(); // Fetching the color scheme (dark or light)
+
   return (
     <ThemeProvider value={colorScheme === 'dark' ? CustomDarkTheme : CustomLightTheme}>
       <Stack>
+        {/* Define each screen */}
         <Stack.Screen 
           name="index" 
           options={{ headerShown: false }} 
@@ -42,8 +44,32 @@ export default function Layout() {
           name="customerPg"
           options={{ headerShown: false }} 
         />
+        <Stack.Screen
+          name="workerPg"
+          options={{ headerShown: false }} 
+        />
         <Stack.Screen 
-          name="redButton" 
+          name="appointmentsPg"
+          options={{ headerShown: false }} 
+        />
+        <Stack.Screen 
+          name="myClientsPg"
+          options={{ headerShown: false }} 
+        />
+        <Stack.Screen 
+          name="chatPg"
+          options={{ headerShown: false }} 
+        />
+        <Stack.Screen 
+          name="myPerformancePg"
+          options={{ headerShown: false }} 
+        />
+        <Stack.Screen 
+          name="rateAndReviewPg"
+          options={{ headerShown: false }} 
+        />
+        <Stack.Screen 
+          name="earningsPg"
           options={{ headerShown: false }} 
         />
         <Stack.Screen 
