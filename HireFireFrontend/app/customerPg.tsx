@@ -32,7 +32,33 @@ const categories = [
 
 export default function CustomerPgScreen() {
   const router = useRouter();
-  const [selectedDate, setSelectedDate] = useState(new Date());
+  const initialDate = new Date();
+  initialDate.setHours(initialDate.getHours() - 19);
+  initialDate.setDate(initialDate.getDate() + 1);
+  const [selectedDate, setSelectedDate] = useState(initialDate);
+  // Add state for selected category
+  const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
+  
+  // Function to handle category selection
+  const handleCategorySelect = (index: number) => {
+    setSelectedCategory(index);
+  };
+  
+  // Function to navigate to the next page
+  const handleNextPress = () => {
+    const selectedCategoryData = categories[selectedCategory!];
+    console.log("Navigating to next page with:", {
+      category: selectedCategoryData,
+      date: selectedDate
+    });
+    
+    // Navigate to the next page with params (replace with your actual route)
+    router.push({
+      pathname: '/customerPg2',
+      // You can pass params if your router supports it
+      // params: { category: selectedCategoryData.label, date: selectedDate.toISOString() }
+    });
+  };
   
   return (
     <SafeAreaView style={styles.container}>
@@ -74,35 +100,79 @@ export default function CustomerPgScreen() {
 
         {/* DateTime */}
         <ThemedText style={styles.DTLabel}>Select Date and Time</ThemedText>
-          <DateTimePicker 
-            initialDate={selectedDate}
-            onDateChange={date => {
-              setSelectedDate(date);
-              console.log("Selected date and time:", date);
-            }}
-          />
+        <DateTimePicker 
+          initialDate={selectedDate}
+          onDateChange={date => {
+          // Create a new date with adjusted time (subtract 19 hours)
+          const adjustedDate = new Date(date);
+          adjustedDate.setHours(date.getHours() - 19);
+          adjustedDate.setDate(date.getDate() + 1);
+    
+          setSelectedDate(adjustedDate);
+          console.log("Selected date and time (adjusted):", adjustedDate);
+        }}
+      />
 
         {/* Categories */}
         <View style={styles.categoriesContainer}>
           <ThemedText style={styles.sectionTitle}>Select Category</ThemedText>
           <View style={styles.gridContainer}>
             {categories.map((item, index) => (
-              <TouchableOpacity key={index} style={styles.categoryCard}>
+              <TouchableOpacity 
+                key={index} 
+                style={[
+                  styles.categoryCard,
+                  selectedCategory === index ? styles.selectedCategoryCard : {}
+                ]}
+                onPress={() => handleCategorySelect(index)}
+              >
                 {item.lib === 'Feather' && (
-                  <Feather name={item.icon as any} size={24} color="#FF4D4D" />
+                  <Feather 
+                    name={item.icon as any} 
+                    size={24} 
+                    color={selectedCategory === index ? "#FFFFFF" : "#FF4D4D"} 
+                  />
                 )}
                 {item.lib === 'Material' && (
-                  <MaterialCommunityIcons name={item.icon as any} size={24} color="#FF4D4D" />
+                  <MaterialCommunityIcons 
+                    name={item.icon as any} 
+                    size={24} 
+                    color={selectedCategory === index ? "#FFFFFF" : "#FF4D4D"} 
+                  />
                 )}
                 {item.lib === 'FA' && (
-                  <FontAwesome6 name={item.icon as any} size={24} color="#FF4D4D" />
+                  <FontAwesome6 
+                    name={item.icon as any} 
+                    size={24} 
+                    color={selectedCategory === index ? "#FFFFFF" : "#FF4D4D"} 
+                  />
                 )}
-                <ThemedText style={styles.categoryLabel}>{item.label}</ThemedText>
+                <ThemedText 
+                  style={[
+                    styles.categoryLabel,
+                    selectedCategory === index ? styles.selectedCategoryText : {}
+                  ]}
+                >
+                  {item.label}
+                </ThemedText>
               </TouchableOpacity>
             ))}
           </View>
         </View>
       </ScrollView>
+      
+      {/* Next Button - Only shown when a category is selected */}
+      {selectedCategory !== null && (
+        <View style={styles.nextButtonContainer}>
+          <TouchableOpacity 
+            style={styles.nextButton}
+            onPress={handleNextPress}
+          >
+            <ThemedText style={styles.nextButtonText}>Next</ThemedText>
+            <Feather name="arrow-right" size={20} color="#FFFFFF" style={styles.nextButtonIcon} />
+          </TouchableOpacity>
+        </View>
+      )}
     </SafeAreaView>
   );
   
@@ -164,6 +234,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F5F0F0',
     paddingHorizontal: 16,
     paddingTop: 16,
+    paddingBottom: 80, // Add padding at bottom for the next button
   },
   categoriesContainer: {
     backgroundColor: '#F5F0F0',
@@ -198,12 +269,21 @@ const styles = StyleSheet.create({
     shadowRadius: 2,
     elevation: 2,
   },
+  selectedCategoryCard: {
+    backgroundColor: '#FF4D4D',
+    borderWidth: 2,
+    borderColor: '#FF4D4D',
+  },
   categoryLabel: {
     marginTop: 8,
     color: '#333333',
     fontWeight: '500',
     fontSize: 16,
     textAlign: 'center',
+  },
+  selectedCategoryText: {
+    color: '#FFFFFF',
+    fontWeight: '600',
   },
   searchContainer: {
     paddingHorizontal: 16,
@@ -238,5 +318,33 @@ const styles = StyleSheet.create({
     color: '#333333',
     marginBottom: 12,
     textAlign: 'center',
+  },
+  nextButtonContainer: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: '#F5F0F0',
+    paddingHorizontal: 20,
+    paddingVertical: 15,
+    borderTopWidth: 1,
+    borderTopColor: '#E0E0E0',
+  },
+  nextButton: {
+    backgroundColor: '#FF4D4D',
+    borderRadius: 25,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 12,
+  },
+  nextButtonText: {
+    color: '#FFFFFF',
+    fontSize: 18,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  nextButtonIcon: {
+    marginLeft: 8,
   },
 });
