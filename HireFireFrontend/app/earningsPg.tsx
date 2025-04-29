@@ -1,3 +1,4 @@
+//potato
 import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { FontAwesome5, MaterialIcons } from '@expo/vector-icons';

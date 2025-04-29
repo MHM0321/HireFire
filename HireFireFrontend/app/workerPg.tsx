@@ -1,3 +1,4 @@
+//potato
 import { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, TextInput, Image, ScrollView, Animated } from 'react-native';
 import { ThemedView } from '@/components/ThemedView';

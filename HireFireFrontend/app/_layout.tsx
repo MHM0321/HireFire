@@ -3,7 +3,6 @@ import { Stack } from 'expo-router';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useColorScheme } from 'react-native';
 
-// Define custom dark and light themes
 const CustomDarkTheme = {
   ...DarkTheme,
   colors: {
@@ -28,14 +27,13 @@ const CustomLightTheme = {
   },
 };
 
-// Main Layout function
-export default function Layout() {
-  const colorScheme = useColorScheme(); // Fetching the color scheme (dark or light)
 
+export default function Layout() {
+  const colorScheme = 'dark';
+  
   return (
     <ThemeProvider value={colorScheme === 'dark' ? CustomDarkTheme : CustomLightTheme}>
       <Stack>
-        {/* Define each screen */}
         <Stack.Screen 
           name="index" 
           options={{ headerShown: false }} 
@@ -44,8 +42,22 @@ export default function Layout() {
           name="customerPg"
           options={{ headerShown: false }} 
         />
-        <Stack.Screen
-          name="workerPg"
+        <Stack.Screen 
+          name="redButton" 
+          options={{ headerShown: false }} 
+        />
+        <Stack.Screen 
+          name="customerPg2"
+          options={{
+          headerTitle: '', }}
+        />
+        <Stack.Screen 
+          name="customerPg3"
+          options={{
+          headerTitle: '', }}
+        />
+        <Stack.Screen 
+          name="customerPg4"
           options={{ headerShown: false }} 
         />
         <Stack.Screen 
@@ -53,11 +65,15 @@ export default function Layout() {
           options={{ headerShown: false }} 
         />
         <Stack.Screen 
-          name="myClientsPg"
+          name="chatPg"
           options={{ headerShown: false }} 
         />
         <Stack.Screen 
-          name="chatPg"
+          name="earningsPg"
+          options={{ headerShown: false }} 
+        />
+        <Stack.Screen 
+          name="myClientsPg"
           options={{ headerShown: false }} 
         />
         <Stack.Screen 
@@ -69,7 +85,7 @@ export default function Layout() {
           options={{ headerShown: false }} 
         />
         <Stack.Screen 
-          name="earningsPg"
+          name="workerPg"
           options={{ headerShown: false }} 
         />
         <Stack.Screen 
