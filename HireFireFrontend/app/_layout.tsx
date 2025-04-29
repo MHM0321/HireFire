@@ -51,6 +51,15 @@ export default function Layout() {
           options={{
           headerTitle: '', }}
         />
+        <Stack.Screen 
+          name="customerPg3"
+          options={{
+          headerTitle: '', }}
+        />
+        <Stack.Screen 
+          name="customerPg4"
+          options={{ headerShown: false }} 
+        />
       </Stack>
     </ThemeProvider>
   );
