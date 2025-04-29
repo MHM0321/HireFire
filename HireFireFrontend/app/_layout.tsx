@@ -60,6 +60,34 @@ export default function Layout() {
           name="customerPg4"
           options={{ headerShown: false }} 
         />
+        <Stack.Screen 
+          name="appointmentsPg"
+          options={{ headerShown: false }} 
+        />
+        <Stack.Screen 
+          name="chatPg"
+          options={{ headerShown: false }} 
+        />
+        <Stack.Screen 
+          name="earningsPg"
+          options={{ headerShown: false }} 
+        />
+        <Stack.Screen 
+          name="myClientsPg"
+          options={{ headerShown: false }} 
+        />
+        <Stack.Screen 
+          name="myPerformancePg"
+          options={{ headerShown: false }} 
+        />
+        <Stack.Screen 
+          name="rateAndReviewPg"
+          options={{ headerShown: false }} 
+        />
+        <Stack.Screen 
+          name="workerPg"
+          options={{ headerShown: false }} 
+        />
       </Stack>
     </ThemeProvider>
   );
