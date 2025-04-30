@@ -4,7 +4,7 @@ import { useRouter } from 'expo-router';
 import { Redirect } from 'expo-router';
 
 export default function Index() {
-  return <Redirect href="/customerPg" />;         //un-comment to make it work
+  return <Redirect href="/workerPg" />;         //un-comment to make it work
   //put name of any page you want to see on the screen as the first thing you want to see when app opens
   //just replace customerPg1 with your desired page name and un-comment the line
   //DO turn it back after changes to avoid conflicts
@@ -17,6 +17,7 @@ export default function Index() {
     </View>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {
@@ -64,4 +65,5 @@ const styles = StyleSheet.create({
     width: '80%',
     alignItems: 'center',
   },
+  
 });

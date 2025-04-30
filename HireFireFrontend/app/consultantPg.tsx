@@ -1,18 +1,15 @@
 import { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, TextInput, Image, ScrollView, Animated } from 'react-native';
 import { ThemedView } from '@/components/ThemedView';
-import { DateTimePicker } from '@/components/DateTimePicker';
 import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import DateTimePicker from '@react-native-community/datetimepicker';
 
-export default function WorkerScreen() {
-  const [location, setLocation] = useState('');
+export default function ConsultantScreen() {
+  const [specialization, setSpecialization] = useState('');
+  const [availabilityFrom, setAvailabilityFrom] = useState(new Date());
+  const [availabilityTo, setAvailabilityTo] = useState(new Date());
   const router = useRouter();
-
-  const mockRequests = [
-    { title: 'Fix Kitchen Sink', details: 'April 30, 3:00 PM - 5:00 PM, Location: XYZ Street' },
-    { title: 'Install Light Fixtures', details: 'May 1, 10:00 AM - 12:00 PM, Location: ABC Avenue' },
-  ];
 
   return (
     <ThemedView style={styles.container}>
@@ -38,93 +35,79 @@ export default function WorkerScreen() {
       {/* Main Content */}
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.welcomeSection}>
-          <Text style={styles.welcomeText}>Welcome, Worker</Text>
+          <Text style={styles.welcomeText}>Welcome, Consultant</Text>
         </View>
 
-        {/* Search */}
+        {/* Specialization Input */}
         <View style={styles.searchContainer}>
           <View style={styles.searchBar}>
-            <Feather name="search" size={20} color="#666666" style={styles.searchIcon} />
+            <Feather name="briefcase" size={20} color="#666666" style={styles.searchIcon} />
             <TextInput
               style={styles.searchInput}
-              placeholder="Set Location"
+              placeholder="Enter Specialization"
               placeholderTextColor="#666666"
-              value={location}
-              onChangeText={setLocation}
+              value={specialization}
+              onChangeText={setSpecialization}
             />
           </View>
         </View>
 
-        {/* Availability Section */}
+        {/* Availability Time Range */}
         <View style={styles.dateTimeSection}>
-  <Text style={styles.sectionHeader}>Set Your Availability</Text>
-  <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-    <View style={{ flex: 1, marginRight: 8 }}>
-      <Text style={styles.timeLabel}>From:</Text>
-      <DateTimePicker mode="time" />
-    </View>
-    <View style={{ flex: 1, marginLeft: 8 }}>
-      <Text style={styles.timeLabel}>To:</Text>
-      <DateTimePicker mode="time" />
-    </View>
-  </View>
-</View>
+          <Text style={styles.sectionHeader}>Set Availability Time</Text>
 
+          <Text style={styles.timeLabel}>From:</Text>
+          <DateTimePicker
+            value={availabilityFrom}
+            mode="time"
+            display="default"
+            onChange={(event, selectedDate) => selectedDate && setAvailabilityFrom(selectedDate)}
+          />
 
-        {/* Work Requests Section */}
-        <View style={styles.requestsSection}>
-          <Text style={styles.sectionHeader}>Work Requests</Text>
-          {mockRequests.map((req, index) => (
-            <View key={index} style={styles.requestCard}>
-              <Text style={styles.requestTitle}>{req.title}</Text>
-              <Text style={styles.requestDetail}>{req.details}</Text>
-              <View style={styles.buttonRow}>
-                <TouchableOpacity style={styles.acceptButton}>
-                  <Text style={styles.buttonText}>Accept</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.declineButton}>
-                  <Text style={styles.buttonText}>Decline</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          ))}
+          <Text style={styles.timeLabel}>To:</Text>
+          <DateTimePicker
+            value={availabilityTo}
+            mode="time"
+            display="default"
+            onChange={(event, selectedDate) => selectedDate && setAvailabilityTo(selectedDate)}
+          />
         </View>
 
         {/* Features */}
         <View style={styles.featuresGrid}>
-          <FeatureCard 
+          <FeatureCard
             iconName="calendar"
-            title="Available Appointments"
-            subtitle="View work requests"
-            onPress={() => router.push('/appointmentsPg')}
+            title="Appointments"
+            subtitle="View client bookings"
+            onPress={() => router.push('/consultantAppointmentsPg')}
           />
-          
-          <FeatureCard 
-            iconName="briefcase"
-            title="My Clients"
-            subtitle="Manage current clients"
-            onPress={() => router.push('/myClientsPg')}
+
+          <FeatureCard
+            iconName="message-circle"
+            title="Consult Messages"
+            subtitle="Chat with clients"
+            onPress={() => router.push('/consultantChatPg')}
           />
-          
-          <FeatureCard 
+
+          <FeatureCard
+            iconName="star"
+            title="Reviews"
+            subtitle="See client feedback"
+            onPress={() => router.push('/consultantReviewsPg')}
+          />
+
+          <FeatureCard
             iconName="bar-chart"
-            title="My Performance"
-            subtitle="View your statistics"
-            onPress={() => router.push('/myPerformancePg')}
+            title="Performance"
+            subtitle="View your stats"
+            onPress={() => router.push('/consultantPerformancePg')}
           />
-          
-          <FeatureCard 
-            iconName="edit-3"
-            title="Rate and Review"
-            subtitle="Review past clients"
-            onPress={() => router.push('/rateAndReviewPg')}
-          />
-          
-          <FeatureCard 
+
+          <FeatureCard
             iconName="dollar-sign"
             title="Earnings"
-            subtitle="Withdraw your money"
-            onPress={() => router.push('/earningsPg')}
+            subtitle="Track your income"
+            onPress={() => router.push('/consultantEarningsPg')}
           />
         </View>
       </ScrollView>
@@ -132,8 +115,7 @@ export default function WorkerScreen() {
   );
 }
 
-// Reusable Feature Card Component
-const FeatureCard = ({ iconName, title, subtitle, onPress }: { iconName: any, title: string, subtitle: string, onPress: () => void }) => {
+const FeatureCard = ({ iconName, title, subtitle, onPress }) => {
   const glowAnim = useState(new Animated.Value(0))[0];
 
   useEffect(() => {
@@ -154,14 +136,8 @@ const FeatureCard = ({ iconName, title, subtitle, onPress }: { iconName: any, ti
   }, [glowAnim]);
 
   const animatedStyle = {
-    shadowOpacity: glowAnim.interpolate({
-      inputRange: [0, 1],
-      outputRange: [0.3, 0.8],
-    }),
-    shadowRadius: glowAnim.interpolate({
-      inputRange: [0, 1],
-      outputRange: [5, 15],
-    }),
+    shadowOpacity: glowAnim.interpolate({ inputRange: [0, 1], outputRange: [0.3, 0.8] }),
+    shadowRadius: glowAnim.interpolate({ inputRange: [0, 1], outputRange: [5, 15] }),
   };
 
   return (
@@ -177,7 +153,6 @@ const FeatureCard = ({ iconName, title, subtitle, onPress }: { iconName: any, ti
   );
 };
 
-// Styles
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -251,6 +226,13 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     textAlign: 'center',
   },
+  timeLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#333333',
+    marginBottom: 4,
+    textAlign: 'center',
+  },
   featuresGrid: {
     paddingHorizontal: 16,
     gap: 16,
@@ -276,53 +258,5 @@ const styles = StyleSheet.create({
   featureSubtitle: {
     fontSize: 14,
     color: '#666666',
-  },
-  requestsSection: {
-    paddingHorizontal: 16,
-    marginBottom: 30,
-  },
-  requestCard: {
-    backgroundColor: '#FFFFFF',
-    padding: 16,
-    borderRadius: 12,
-    borderWidth: 2,
-    borderColor: '#FF0000',
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    marginBottom: 12,
-  },
-  requestTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 4,
-  },
-  requestDetail: {
-    fontSize: 14,
-    color: '#666',
-    marginBottom: 12,
-  },
-  buttonRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  acceptButton: {
-    backgroundColor: '#28a745',
-    padding: 10,
-    borderRadius: 8,
-    flex: 0.48,
-    alignItems: 'center',
-  },
-  declineButton: {
-    backgroundColor: '#dc3545',
-    padding: 10,
-    borderRadius: 8,
-    flex: 0.48,
-    alignItems: 'center',
-  },
-  buttonText: {
-    color: '#fff',
-    fontWeight: 'bold',
   },
 });
