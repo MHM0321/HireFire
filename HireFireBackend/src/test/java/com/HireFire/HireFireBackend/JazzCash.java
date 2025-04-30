@@ -5,9 +5,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @RestController
@@ -37,6 +37,10 @@ public class JazzCash {
         data.put("pp_SecureHash", hash);
 
         return ResponseEntity.ok(data);
+    }
+
+    private String generateSecureHash(Map<String, String> data) {
+        return "";
     }
 
     @PostMapping("/api/jazzcash/payment-return")

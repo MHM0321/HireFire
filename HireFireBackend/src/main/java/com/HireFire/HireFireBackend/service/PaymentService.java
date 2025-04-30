@@ -14,10 +14,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -40,7 +38,7 @@ public class PaymentService {
         this.jazzCashService = jazzCashService;
     }
 
-    @Transactional
+    // Remove @Transactional annotation
     public PaymentResponse initiatePayment(PaymentInitiationRequest request) {
         logger.info("Initiating payment for user: {}, worker: {}, amount: {}",
                 request.getUserId(), request.getWorkerId(), request.getAmount());
@@ -65,7 +63,7 @@ public class PaymentService {
         // Save payment to in-memory storage
         payment = paymentRepository.save(payment);
 
-        // Initiate JazzCash payment (this remains unchanged as it's external)
+        // Initiate JazzCash payment
         String redirectUrl = jazzCashService.initiatePayment(payment);
 
         // Return response
@@ -78,6 +76,7 @@ public class PaymentService {
         return response;
     }
 
+    // Rest of the methods remain the same...
     public Payment getPaymentByReference(String reference) {
         return paymentRepository.findByPaymentReference(reference)
                 .orElseThrow(() -> new PaymentException("Payment not found"));
@@ -100,4 +99,3 @@ public class PaymentService {
         return "HF-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
     }
 }
-

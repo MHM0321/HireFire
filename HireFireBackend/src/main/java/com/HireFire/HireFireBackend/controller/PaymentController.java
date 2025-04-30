@@ -21,9 +21,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/payments")
 public class PaymentController {
-
     private static final Logger logger = LoggerFactory.getLogger(PaymentController.class);
-
     private final PaymentService paymentService;
     private final JazzCashService jazzCashService;
 
@@ -31,6 +29,11 @@ public class PaymentController {
     public PaymentController(PaymentService paymentService, JazzCashService jazzCashService) {
         this.paymentService = paymentService;
         this.jazzCashService = jazzCashService;
+    }
+
+    @GetMapping("/work")
+    public String working(){
+        return "It is working man";
     }
 
     /**

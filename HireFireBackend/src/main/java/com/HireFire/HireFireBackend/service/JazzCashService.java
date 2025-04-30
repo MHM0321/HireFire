@@ -14,7 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
@@ -28,7 +27,6 @@ import java.util.UUID;
 
 @Service
 public class JazzCashService {
-
     private static final Logger logger = LoggerFactory.getLogger(JazzCashService.class);
 
     private final RestTemplate restTemplate;
@@ -51,12 +49,6 @@ public class JazzCashService {
         this.notificationService = notificationService;
     }
 
-    /**
-     * Initiates a payment transaction with JazzCash
-     *
-     * @param payment The payment entity to process
-     * @return The redirect URL for the JazzCash payment page
-     */
     public String initiatePayment(Payment payment) {
         try {
             JazzCashRequestDTO requestDTO = prepareJazzCashRequest(payment);
@@ -76,23 +68,19 @@ public class JazzCashService {
         }
     }
 
-    /**
-     * Prepares the JazzCash request DTO with all required parameters
-     */
     private JazzCashRequestDTO prepareJazzCashRequest(Payment payment) {
         JazzCashRequestDTO requestDTO = new JazzCashRequestDTO();
 
         // Generate unique transaction reference number
-        String txnRefNo = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
-        txnRefNo = txnRefNo + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+        String txnRefNo = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"))
+                + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
 
         // Format amount to PKR without decimals (e.g., 100.50 -> 10050)
-        String amount = payment.getAmount().multiply(new BigDecimal("100")).setScale(0, RoundingMode.HALF_UP).toString();
+        String amount = payment.getAmount().multiply(new BigDecimal("100"))
+                .setScale(0, RoundingMode.HALF_UP).toString();
 
-        // Generate transaction date time
         String txnDateTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
 
-        // Rest of the method remains the same
         requestDTO.setPp_Version(JazzCashConstants.VERSION);
         requestDTO.setPp_TxnType(JazzCashConstants.TXN_TYPE);
         requestDTO.setPp_Language(JazzCashConstants.LANGUAGE);
@@ -106,7 +94,7 @@ public class JazzCashService {
         requestDTO.setPp_Description("Payment for " + payment.getWorker().getSpecialization() + " service");
         requestDTO.setPp_ReturnURL(jazzCashConfig.getReturnUrl());
 
-        // Optional fields - customer and worker information
+        // Optional fields
         requestDTO.setPpmpf_1(payment.getUser().getName());
         requestDTO.setPpmpf_2(payment.getUser().getMobileNumber());
         requestDTO.setPpmpf_3(payment.getWorker().getName());
@@ -120,9 +108,6 @@ public class JazzCashService {
         return requestDTO;
     }
 
-    /**
-     * Generates a secure hash for the JazzCash request using their required format
-     */
     private String generateSecureHash(JazzCashRequestDTO requestDTO) {
         StringBuilder hashString = new StringBuilder();
         hashString.append(requestDTO.getPp_Amount())
@@ -141,9 +126,6 @@ public class JazzCashService {
         return hashUtils.generateSecureHash(hashString.toString(), jazzCashConfig.getHashKey());
     }
 
-    /**
-     * Creates a redirect URL with all necessary parameters for JazzCash payment page
-     */
     private String createRedirectUrl(JazzCashRequestDTO requestDTO) {
         MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
         map.add("pp_Version", requestDTO.getPp_Version());
@@ -168,9 +150,6 @@ public class JazzCashService {
         return jazzCashConfig.getApiUrl() + "?" + mapToQueryString(map);
     }
 
-    /**
-     * Converts a MultiValueMap to a URL query string
-     */
     private String mapToQueryString(MultiValueMap<String, String> map) {
         StringBuilder queryString = new StringBuilder();
         map.forEach((key, values) -> {
@@ -184,9 +163,6 @@ public class JazzCashService {
         return queryString.toString();
     }
 
-    /**
-     * Verifies the integrity and authenticity of a JazzCash callback
-     */
     public boolean verifyCallbackHash(JazzCashCallbackRequest callbackRequest) {
         try {
             Map<String, String> params = callbackRequest.getParameters();
@@ -197,7 +173,6 @@ public class JazzCashService {
                 return false;
             }
 
-            // Rebuild hash string from received parameters
             StringBuilder hashString = new StringBuilder();
             hashString.append(params.get("pp_Amount"))
                     .append("&").append(params.get("pp_BillReference"))
@@ -212,8 +187,6 @@ public class JazzCashService {
                     .append("&").append(params.get("pp_TxnType"));
 
             String calculatedHash = hashUtils.generateSecureHash(hashString.toString(), jazzCashConfig.getHashKey());
-
-            // Compare calculated hash with received hash
             boolean isValid = calculatedHash.equals(receivedHash);
 
             if (!isValid) {
@@ -227,56 +200,38 @@ public class JazzCashService {
         }
     }
 
-    /**
-     * Verifies the payment based on the JazzCash callback
-     */
     public boolean verifyPayment(JazzCashCallbackRequest callbackRequest) {
-        // Extract parameters from the callback
         String responseCode = callbackRequest.getParameter("pp_ResponseCode");
         String responseMessage = callbackRequest.getParameter("pp_ResponseMessage");
         String txnRefNo = callbackRequest.getParameter("pp_TxnRefNo");
-        String billReference = callbackRequest.getParameter("pp_BillReference");
 
         logger.info("Received JazzCash callback: txnRefNo={}, responseCode={}, message={}",
                 txnRefNo, responseCode, responseMessage);
 
-        // First verify hash to ensure callback authenticity
-        boolean hashVerified = verifyCallbackHash(callbackRequest);
-
-        if (!hashVerified) {
+        if (!verifyCallbackHash(callbackRequest)) {
             logger.error("Hash verification failed for callback");
             return false;
         }
 
-        // Validate response code
         return JazzCashConstants.RESPONSE_CODE_SUCCESS.equals(responseCode);
     }
 
-    /**
-     * Process the payment callback from JazzCash
-     */
-    @Transactional
     public PaymentResponse processPaymentCallback(JazzCashCallbackRequest callbackRequest) {
         String billReference = callbackRequest.getParameter("pp_BillReference");
         String responseCode = callbackRequest.getParameter("pp_ResponseCode");
         String responseMessage = callbackRequest.getParameter("pp_ResponseMessage");
         String txnRefNo = callbackRequest.getParameter("pp_TxnRefNo");
-        String retrievalRefNo = callbackRequest.getParameter("pp_RetreivalReferenceNo");
 
-        // Find the payment by reference
-        Optional<Payment> paymentOpt = paymentRepository.findByPaymentReference(billReference);
+        Payment payment = paymentRepository.findByPaymentReference(billReference)
+                .orElseThrow(() -> {
+                    logger.error("Payment not found for reference: {}", billReference);
+                    return new PaymentException("Payment not found for reference: " + billReference);
+                });
 
-        if (paymentOpt.isEmpty()) {
-            logger.error("Payment not found for reference: {}", billReference);
-            throw new PaymentException("Payment not found for reference: " + billReference);
-        }
-
-        Payment payment = paymentOpt.get();
         PaymentResponse response = new PaymentResponse();
         response.setPaymentReference(billReference);
         response.setAmount(payment.getAmount());
 
-        // Update payment status based on response code
         if (JazzCashConstants.RESPONSE_CODE_SUCCESS.equals(responseCode)) {
             payment.setStatus(PaymentStatus.COMPLETED);
             payment.setCompletedAt(LocalDateTime.now());
@@ -285,10 +240,7 @@ public class JazzCashService {
             payment.setPpResponseMessage(responseMessage);
             payment.setPpBillReference(billReference);
 
-            // Save the updated payment
-            payment = paymentRepository.save(payment);
-
-            // Notify worker about successful payment
+            paymentRepository.save(payment);
             notifyWorker(payment);
 
             response.setStatus(PaymentStatus.COMPLETED);
@@ -297,7 +249,6 @@ public class JazzCashService {
             payment.setStatus(PaymentStatus.PROCESSING);
             payment.setPpResponseCode(responseCode);
             payment.setPpResponseMessage(responseMessage);
-
             paymentRepository.save(payment);
 
             response.setStatus(PaymentStatus.PROCESSING);
@@ -306,7 +257,6 @@ public class JazzCashService {
             payment.setStatus(PaymentStatus.FAILED);
             payment.setPpResponseCode(responseCode);
             payment.setPpResponseMessage(responseMessage);
-
             paymentRepository.save(payment);
 
             response.setStatus(PaymentStatus.FAILED);
@@ -316,17 +266,10 @@ public class JazzCashService {
         return response;
     }
 
-    /**
-     * Check the status of a payment
-     */
     public PaymentResponse checkPaymentStatus(String paymentReference) {
-        Optional<Payment> paymentOpt = paymentRepository.findByPaymentReference(paymentReference);
+        Payment payment = paymentRepository.findByPaymentReference(paymentReference)
+                .orElseThrow(() -> new PaymentException("Payment not found for reference: " + paymentReference));
 
-        if (paymentOpt.isEmpty()) {
-            throw new PaymentException("Payment not found for reference: " + paymentReference);
-        }
-
-        Payment payment = paymentOpt.get();
         PaymentResponse response = new PaymentResponse();
         response.setPaymentReference(payment.getPaymentReference());
         response.setAmount(payment.getAmount());
@@ -353,9 +296,6 @@ public class JazzCashService {
         return response;
     }
 
-    /**
-     * Notify worker about successful payment
-     */
     private void notifyWorker(Payment payment) {
         try {
             notificationService.sendPaymentConfirmation(payment);
@@ -365,4 +305,3 @@ public class JazzCashService {
         }
     }
 }
-
