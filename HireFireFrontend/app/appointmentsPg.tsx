@@ -31,21 +31,7 @@ export default function AvailableAppointmentsScreen() {
 
   return (
     <ThemedView style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.headerButton} onPress={handleBackPress}>
-          <Feather name="arrow-left" size={24} color="#FFFFFF" />
-        </TouchableOpacity>
-
-        <View style={styles.logoContainer}>
-          <Image
-            source={require('@/assets/images/logoText.png')}
-            style={styles.logo}
-            resizeMode="contain"
-          />
-        </View>
-      </View>
-
+      
       {/* Main Content */}
       <ScrollView contentContainerStyle={styles.content}>
         <Text style={styles.sectionTitle}>Available Appointments</Text>
