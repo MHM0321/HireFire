@@ -12,8 +12,8 @@ export const LocationSearch = ({ onLocationSelect }: { onLocationSelect: (locati
   // Add proper headers for Nominatim
   const searchOptions = {
     headers: {
-      'User-Agent': 'YourAppName/1.0 (your@email.com)', // Required by Nominatim
-      'Accept-Language': 'en' // Get English results
+      'User-Agent': 'YourAppName/1.0 (your@email.com)',
+      'Accept-Language': 'en'
     }
   };
 
@@ -43,12 +43,10 @@ export const LocationSearch = ({ onLocationSelect }: { onLocationSelect: (locati
         searchOptions
       );
       
-      // Check if response is OK
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      // Check content type
       const contentType = response.headers.get('content-type');
       if (!contentType || !contentType.includes('application/json')) {
         throw new Error('Invalid content type');
@@ -67,11 +65,11 @@ export const LocationSearch = ({ onLocationSelect }: { onLocationSelect: (locati
   return (
     <View style={styles.container}>
       <View style={styles.searchBar}>
-        <Feather name="search" size={20} color="#666" style={styles.searchIcon} />
+        <Feather name="search" size={20} color="#FF4D4D" style={styles.searchIcon} />
         <TextInput
-          style={styles.input}
+          style={[styles.input, { color: '#FF4D4D' }]}
           placeholder="Search location (e.g., Lahore)"
-          placeholderTextColor="#999"
+          placeholderTextColor="#FF9999" // Lighter red for placeholder
           value={query}
           onChangeText={setQuery}
           returnKeyType="search"
@@ -99,7 +97,6 @@ export const LocationSearch = ({ onLocationSelect }: { onLocationSelect: (locati
   );
 };
 
-// Updated styles with better visual feedback
 const styles = StyleSheet.create({
   container: {
     marginBottom: 16,
@@ -112,6 +109,8 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     paddingHorizontal: 16,
     paddingVertical: 12,
+    borderWidth: 1,
+    borderColor: '#FF4D4D',
   },
   searchIcon: {
     marginRight: 8,
@@ -119,7 +118,6 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     fontSize: 16,
-    color: '#333',
   },
   resultsList: {
     maxHeight: 200,
@@ -127,13 +125,37 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginTop: 8,
     elevation: 2,
+    borderWidth: 1,
+    borderColor: '#FF4D4D',
   },
   resultItem: {
     padding: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#EEE',
+    borderBottomColor: '#FFCCCC',
   },
   resultText: {
     fontSize: 14,
+    color: '#FF4D4D',
+    fontWeight: '500',
+  },
+  selectedLocationContainer: {
+    backgroundColor: '#FFF0F0',
+    padding: 16,
+    borderRadius: 8,
+    marginHorizontal: 16,
+    marginBottom: 16,
+    elevation: 2,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#FF4D4D',
+  },
+  selectedLocationText: {
+    fontSize: 14,
+    color: '#FF4D4D',
+    flex: 1,
+    marginRight: 8,
+    fontWeight: '600',
   },
 });
