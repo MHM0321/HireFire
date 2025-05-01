@@ -14,7 +14,7 @@ export default function Index() {
     <View style={styles.container}>
       <Text style={styles.title}>Welcome!</Text>
 
-    </View>
+    </View  >
   );
 }
 
