@@ -79,14 +79,15 @@ const Login = () => {
 
   return (
     <View style={styles.container}>
-      {/* <View style={styles.centerContainer}>
+      <View style={styles.centerContainer}>
         <Image
-          source={require('@/assets/images/logoText.png')}
+          source={require('@/assets/images/logo.png')}
           style={styles.logoImage}
           resizeMode="contain"
         />
-      </View> */}
-      <Text style={styles.title}>Login</Text>
+        <Text style={styles.logoText}>Welcome to Hire<Text style={styles.logoTextRed}>Fire</Text>!</Text>
+        <Text>Login with your HireFire account to start.</Text>
+      </View>
 
       {/* Display error message if there is one */}
       {errorMessage ? (
@@ -168,11 +169,6 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: '#f9f9f9',
   },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
-  },
   messageContainer: {
     width: '100%',
     padding: 10,
@@ -250,14 +246,23 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   centerContainer: {
+    marginBottom: 60,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
   },
   logoImage: {
-    width: 120,
-    height: 60,
+    height: 80
   },
+  logoText: {
+    fontSize: 32,
+    padding: 12,
+    fontWeight: 'bold',
+    color: "#1A0D0E"
+  },
+  logoTextRed: {
+    color: "#E45959",
+  }
 });
 
 export default Login;
