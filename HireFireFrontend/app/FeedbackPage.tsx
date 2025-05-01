@@ -21,6 +21,7 @@ const FeedbackScreen = () => {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [rating, setRating] = useState<number>(0);
   const [hoverRating, setHoverRating] = useState<number>(0);
+  const router = useRouter();
 
   const handleSubmit = () => {
     console.log("Feedback submitted:", feedback);
