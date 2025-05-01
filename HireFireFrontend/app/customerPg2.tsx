@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import usersData from '@/assets/data/exampleUsers.json';
 import { Feather, FontAwesome } from '@expo/vector-icons';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { ThemedText } from '@/components/ThemedText';
 import { useAppContext } from '@/scripts/AppContext';
 
@@ -39,6 +39,13 @@ export default function CustomerPg2CScreen() {
     return base + bonus;
   };
   const {user, setUser} = useAppContext();
+  const {
+    result
+  } = useLocalSearchParams<{
+    result: User[]
+  } | any>();
+  const workerList = JSON.parse(result);
+  
 
   const renderStars = (rating: number) => {
     const stars = [];
@@ -82,8 +89,8 @@ export default function CustomerPg2CScreen() {
         </View>
 
         {/* Worker Cards - Dynamically rendered based on usersData length */}
-        {(usersData as User[]).map(user => (
-          <View key={user.id} style={styles.card}>
+        {(workerList as User[]).map((user: any) => (
+          <View key={user.userId} style={styles.card}>
             <View style={styles.cardContent}>
               {/* Left side - Avatar */}
               <View style={styles.avatarContainer}>
@@ -110,12 +117,12 @@ export default function CustomerPg2CScreen() {
 
                 {/* Action buttons */}
                 <View style={styles.actionRow}>
-                  <TouchableOpacity style={styles.chatButton} onPress={() => handleChatButtonPress(user.name, user.id)}>
+                  <TouchableOpacity style={styles.chatButton} onPress={() => handleChatButtonPress(user.name, user.userId)}>
                     <FontAwesome name="comment-o" size={20} color="#333" />
                   </TouchableOpacity>
                   <TouchableOpacity 
                     style={styles.bookButton}
-                    onPress={() => router.push({ pathname: '/customerPg3', params: { userId: user.id } })}
+                    onPress={() => router.push({ pathname: '/customerPg3', params: { userId: user.userId } })}
                   >
                     <Text style={styles.bookButtonText}>Hire Details</Text>
                     <Feather name="arrow-right" size={18} color="#FFF" />

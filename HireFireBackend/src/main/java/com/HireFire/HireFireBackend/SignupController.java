@@ -37,21 +37,22 @@ public class SignupController {
                             "id INTEGER PRIMARY KEY AUTOINCREMENT," +
                             "name TEXT NOT NULL," +
                             "email TEXT NOT NULL UNIQUE," +
-                            "password TEXT NOT NULL," +
-                            "is_worker BOOLEAN NOT NULL DEFAULT 0" +
+                            "password TEXT NOT NULL" +
                             ")";
 
             // Create workers table
             String createWorkerTableSQL =
                     "CREATE TABLE IF NOT EXISTS workers (" +
-                            "id INTEGER PRIMARY KEY AUTOINCREMENT," +
-                            "name TEXT NOT NULL," +
-                            "email TEXT NOT NULL UNIQUE," +
-                            "password TEXT NOT NULL," +
-                            "skills TEXT," +
-                            "experience TEXT," +
-                            "hourly_rate REAL" +
-                            ")";
+                        "id             INTEGER PRIMARY KEY AUTOINCREMENT," +
+                        "name       	TEXT NOT NULL," +
+                        "email      	TEXT NOT NULL UNIQUE," +
+                        "password       TEXT NOT NULL," +
+                        "category       TEXT," +
+                        "experience     TEXT," +
+                        "hourly_rate    REAL," +
+                        "availability   TEXT," +
+                        "location       TEXT" +
+                    ")";
 
             try (PreparedStatement userStmt = conn.prepareStatement(createUserTableSQL);
                  PreparedStatement workerStmt = conn.prepareStatement(createWorkerTableSQL)) {
@@ -89,6 +90,25 @@ public class SignupController {
 
         public boolean isWorker() { return isWorker; }
         public void setWorker(boolean isWorker) { this.isWorker = isWorker; }
+    }
+
+    public static class WorkerSignupRequest extends SignupRequest {
+        private String category;
+        private String experience;
+        private Integer hourlyRate;
+        private String availability;
+
+        public String getCategory() { return category; }
+        public void setCategory(String category) { this.category = category; }
+
+        public String getExperience() { return experience; }
+        public void setExperience(String experience) { this.experience = experience; }
+
+        public Integer getHourlyRate() { return hourlyRate; }
+        public void setHourlyRate(Integer hourlyRate) { this.hourlyRate = hourlyRate; }
+        
+        public String getAvailability() { return availability; }
+        public void setAvailability(String availability) { this.availability = availability; }
     }
 
     // Response DTO
@@ -159,7 +179,7 @@ public class SignupController {
 
     // Worker-specific signup endpoint
     @PostMapping("/worker/signup")
-    public ResponseEntity<ApiResponse> registerWorker(@RequestBody SignupRequest signupRequest) {
+    public ResponseEntity<ApiResponse> registerWorker(@RequestBody WorkerSignupRequest signupRequest) {
         try {
             // Check if the email already exists in either table
             try (Connection conn = getConnection()) {
@@ -189,11 +209,15 @@ public class SignupController {
                 String hashedPassword = hashPassword(signupRequest.getPassword());
 
                 // Insert into workers table (always - this is the worker signup endpoint)
-                String insertWorkerSql = "INSERT INTO workers (name, email, password) VALUES (?, ?, ?)";
+                String insertWorkerSql = "INSERT INTO workers (name, email, password, category, experience, hourly_rate, availability) VALUES (?, ?, ?, ?, ?, ?, ?)";
                 try (PreparedStatement stmt = conn.prepareStatement(insertWorkerSql)) {
                     stmt.setString(1, signupRequest.getName());
                     stmt.setString(2, signupRequest.getEmail());
                     stmt.setString(3, hashedPassword);
+                    stmt.setString(4, signupRequest.getCategory());
+                    stmt.setString(5, signupRequest.getExperience());
+                    stmt.setInt(6, signupRequest.getHourlyRate());
+                    stmt.setString(7, signupRequest.getAvailability());
                     stmt.executeUpdate();
                 }
                 return ResponseEntity.ok(new ApiResponse(true, "Worker registered successfully"));

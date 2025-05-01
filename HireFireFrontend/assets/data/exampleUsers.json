@@ -23,12 +23,12 @@
     },
     {
         "id": 3,
-        "name": "Giga Nigga",
+        "name": "Big Foot",
         "rating": 2,
         "reviews": 12,
         "image": "https://example.com/avatar3.png",
         "fee": "Rs. 8000/hr",
-        "email": "NIGG@gmail.com",
+        "email": "bigfoot@gmail.com",
         "phone": "0123456789",
         "address": "Lahore, DHA Phase 2"
     },

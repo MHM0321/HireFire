@@ -11,6 +11,7 @@ import {
 import { Feather } from "@expo/vector-icons";
 import { ThemedView } from "@/components/ThemedView";
 import { useRouter } from "expo-router";
+import { useAppContext } from "@/scripts/AppContext";
 
 export default function MyClientsScreen() {
   const router = useRouter();
@@ -20,6 +21,8 @@ export default function MyClientsScreen() {
     { id: "3", name: "Sophia Williams" },
   ]);
 
+  const {user, setUser} = useAppContext();
+
   const handleBackPress = () => {
     router.back();
   };
@@ -27,7 +30,7 @@ export default function MyClientsScreen() {
   const handleMessagePress = (clientName: string, clientId: string) => {
     router.push({
       pathname: "/chatPg",
-      params: { clientName, clientId, workerName, workerId, role: 'worker' },
+      params: { clientName, clientId, workerName: user?.name, workerId: user?.userId, role: 'worker' },
     });
   };
 

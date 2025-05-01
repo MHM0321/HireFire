@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   SafeAreaView,
   ScrollView,
+  Alert,
 } from "react-native";
 import { useRouter } from "expo-router";
 
@@ -21,6 +22,9 @@ import { LocationMapModal } from '@/components/LocationMapModal';
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { IconSymbol } from "@/components/ui/IconSymbol";
+import LoadingModal from "@/components/LoadingModal";
+import axios from "axios";
+import { BASE_URL } from "@/config";
 
 const categories = [
   { icon: "zap", label: "Electrician", lib: "Feather" },
@@ -47,6 +51,7 @@ export default function CustomerPgScreen() {
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
   const [selectedLocation, setSelectedLocation] = useState<any>(null);
   const [showMapModal, setShowMapModal] = useState(false);
+  const [loadingWorkers, setLoadingWorkers] = useState(false);
 
   // Function to handle category selection
   const handleCategorySelect = (index: number) => {
@@ -55,7 +60,8 @@ export default function CustomerPgScreen() {
   };
 
   // Function to navigate to the next page
-  const handleNextPress = () => {
+  const handleNextPress = async () => {
+    setLoadingWorkers(true);
     const selectedCategoryData = categories[selectedCategory!];
     console.log("Navigating to next page with:", {
       category: selectedCategoryData,
@@ -65,17 +71,35 @@ export default function CustomerPgScreen() {
       lon: selectedLocation.lon
     });
 
-    // Navigate to the next page with params (replace with your actual route)
-    router.push({
-      pathname: "/customerPg2",
-      // You can pass params if your router supports it
-      // params: { category: selectedCategoryData.label, date: selectedDate.toISOString() }
-    });
+    const requestBody = {
+      location: {
+        lat: selectedLocation.lat,
+        lon: selectedLocation.lon  
+      },
+      dateTime: selectedDate.getHours() + ":" + selectedDate.getMinutes(),
+      category: categories[selectedCategory || 0].label
+    }
+
+    try {
+      console.log(requestBody);
+      const response = await axios.post(BASE_URL + 'api/worker/lookup', requestBody);
+      if (!response.data.success)
+        throw response.data;
+
+      router.push({
+        pathname: "/customerPg2",
+        params: {result: JSON.stringify(response.data.result)}
+      });
+      console.log(response.data.result);
+    } catch (error: any) {
+        Alert.alert(error.message);
+    }
+    setLoadingWorkers(false);
   };
 
   return (
     <SafeAreaView style={styles.container}>
-
+        {loadingWorkers && <LoadingModal />}
          {/* Location Search */}
          <LocationSearch
           onLocationSelect={(location) => {
@@ -101,6 +125,8 @@ export default function CustomerPgScreen() {
         <DateTimePicker
           initialDate={selectedDate}
           onDateChange={(date) => {
+            setSelectedDate(date); return;
+            
             // Create a new date with adjusted time (subtract 19 hours)
             const adjustedDate = new Date(date);
             adjustedDate.setHours(date.getHours() - 19);

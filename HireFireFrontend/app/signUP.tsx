@@ -1,9 +1,17 @@
 import axios from 'axios';
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Switch } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Switch, ScrollView } from 'react-native';
+import { Dropdown } from 'react-native-element-dropdown';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons'; // Import Ionicons from Expo
 import { BASE_URL } from '@/config';
+import TimePicker from '@/components/TimePicker';
+import { TimeRange } from '@/scripts/timeRange';
+
+const categories = [
+  "Electrician", "Mechanic", "Plumber", "Carpenter", "Painter", "Labourer",
+  "Janitor", "Gardener", "Cook", "Mason", "Baby Sitter", "Gas Fitter"
+];
 
 const Signup = () => {
   const [name, setName] = useState('');
@@ -13,6 +21,11 @@ const Signup = () => {
   const [isWorker, setIsWorker] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
+  const [category, setCategory] = useState('');
+  const [experience, setExperience] = useState('');
+  const [hourlyRate, setHourlyRate] = useState('');
+  const [availableStart, setAvailableStart] = useState({hours: 9, minutes: 0});
+  const [availableEnd, setAvailableEnd] = useState({hours: 17, minutes: 0});
   // States to toggle password visibility
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -24,7 +37,7 @@ const Signup = () => {
     setSuccessMessage('');
 
     // Validate inputs
-    if (!name || !email || !password || !confirmPassword) {
+    if (!name || !email || !password || !confirmPassword || (isWorker && (!category || !hourlyRate || !experience))) {
       setErrorMessage('Please fill all fields');
       return;
     }
@@ -39,12 +52,22 @@ const Signup = () => {
         ? BASE_URL + 'api/auth/worker/signup'
         : BASE_URL + 'api/auth/signup';
 
-    const userData = {
+    let userData: any = {
       name: name,
       email: email.toLowerCase(),
       password: password,
-      isWorker: isWorker,
+      isWorker,
     };
+
+    if (isWorker)
+      userData = {
+        ...userData,
+        category,
+        experience,
+        hourlyRate,
+        availability: TimeRange.toString(availableStart, availableEnd)
+      }
+
 
     try {
       const response = await axios.post(apiUrl, userData);
@@ -57,7 +80,7 @@ const Signup = () => {
           [
             {
               text: 'Login Now',
-              onPress: () => router.push(isWorker ? ('/worker/login' as any) : '/login')
+              onPress: () => router.push('/login')
             },
             {
               text: 'OK'
@@ -102,6 +125,10 @@ const Signup = () => {
     }
   };
 
+  const handleTimeChange = (hours: any, minutes: any, setFunction: any) => {
+    setFunction({hours, minutes});
+  }
+
   // Handler to navigate to appropriate login page
   const goToLogin = () => {
     router.back();
@@ -118,7 +145,7 @@ const Signup = () => {
   };
 
   return (
-      <View style={styles.container}>
+      <ScrollView style={styles.scrollContainer} contentContainerStyle={styles.container}>
         <Text style={styles.title}>Sign Up</Text>
 
         {/* Display error message if there is one */}
@@ -208,6 +235,83 @@ const Signup = () => {
           />
         </View>
 
+        {isWorker && <View style={styles.workerOnly}>
+          <Text>Category</Text>
+
+          <Dropdown
+            mode='modal'
+            style={styles.workerCategoryDropdown}
+            placeholderStyle={styles.workerCategoryPlaceholder}
+            selectedTextStyle={styles.workerCategorySelectedText}
+            data={categories.map(a => {return {label: a, value: a}})}
+            maxHeight={200}
+            labelField="label"
+            valueField="value"
+            placeholder="Select item"
+            value={category}
+            onChange={item => {
+              setCategory(item.value);
+            }}
+          />
+
+          <View style={styles.splitContainer}>
+            <View style={styles.fullWidth}>
+              <Text>Experience (years)</Text>
+              <TextInput
+                style={{...styles.input}}
+                keyboardType="numeric"
+                value={experience}
+                onChangeText={setExperience}
+                placeholder="e.g. 3"
+                placeholderTextColor="grey"
+                returnKeyType='done'
+              />
+            </View>
+            <View style={styles.fullWidth}>
+              <Text>Hourly Rate (Rs.)</Text>
+              <TextInput
+                style={{...styles.input}}
+                keyboardType="numeric"
+                value={hourlyRate}
+                onChangeText={setHourlyRate}
+                placeholder="e.g. Rs. 250"
+                placeholderTextColor="grey"
+                returnKeyType='done'
+              />
+            </View>
+          </View>
+
+          <View style={styles.splitContainer}>
+            <View style={styles.fullWidth}>
+              <Text>From:</Text>
+              <TimePicker 
+                initialHours={availableStart.hours}
+                initialMinutes={availableStart.minutes}
+                onTimeChange={(hours, minutes) => handleTimeChange(hours, minutes, setAvailableStart)}
+              />
+            </View>
+            <View style={styles.fullWidth}>
+              <Text>To:</Text>
+              <TimePicker 
+                initialHours={availableEnd.hours}
+                initialMinutes={availableEnd.minutes}
+                onTimeChange={(hours, minutes) => {
+                  console.log({hours, minutes}, availableStart);
+                  console.log((minutes + (hours * 60)), (availableStart.minutes + (availableStart.hours * 60)), (availableEnd.minutes + (availableEnd.hours * 60)));
+                  if ((minutes + (hours * 60)) > (availableStart.minutes + (availableStart.hours * 60)))
+                    handleTimeChange(hours, minutes, setAvailableEnd)
+                  else
+                    handleTimeChange(availableStart.hours, availableStart.minutes, setAvailableEnd);
+                }}
+              />
+            </View>
+          </View>
+
+          {/* <TouchableOpacity style={styles.button} onPress={() => {
+            Alert.alert(`${availableStart.hours}:${availableStart.minutes}\n${availableEnd.hours}:${availableEnd.minutes}`);
+          }}><Text>pressme</Text></TouchableOpacity> */}
+        </View>}
+
         <TouchableOpacity style={styles.button} onPress={handleSignup}>
           <Text style={styles.buttonText}>Sign Up</Text>
         </TouchableOpacity>
@@ -219,17 +323,29 @@ const Signup = () => {
             <Text style={styles.loginLink}>Login</Text>
           </TouchableOpacity>
         </View>
-      </View>
+      </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
+  scrollContainer: {
+    backgroundColor: '#f9f9f9',
+  },
   container: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
-    backgroundColor: '#f9f9f9',
+    // marginVertical: 100,
+  },
+  splitContainer: {
+    display: "flex",
+    gap: 5,
+    flexDirection: "row",
+    alignSelf: "stretch"
+  },
+  fullWidth: {
+    width: "50%"
   },
   title: {
     fontSize: 24,
@@ -311,6 +427,28 @@ const styles = StyleSheet.create({
   loginLink: {
     color: '#E45959',
     fontWeight: 'bold',
+  },
+  workerOnly: {
+    marginVertical: 12,
+    width: "100%",
+  },
+  workerCategoryDropdown: {
+    width: '100%',
+    height: 50,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    marginBottom: 15,
+    backgroundColor: '#fff',
+  },
+  workerCategoryPlaceholder: {
+    color: '#999',
+    fontSize: 16,
+  },
+  workerCategorySelectedText: {
+    color: '#333',
+    fontSize: 16,
   },
 });
 

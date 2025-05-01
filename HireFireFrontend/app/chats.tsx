@@ -18,11 +18,7 @@ import firebaseDb from "@/firebase";
 export default function MyClientsScreen() {
   const router = useRouter();
   const [chatsLoading, setChatsLoading] = useState(true);
-  const [chats, setChats] = useState([
-    // { id: "1", name: "Emily Johnson" },
-    // { id: "2", name: "Daniel Smith" },
-    // { id: "3", name: "Sophia Williams" },
-  ]);
+  const [chats, setChats] = useState([]);
   const {user, setUser} = useAppContext();
 
   const handleBackPress = () => {
