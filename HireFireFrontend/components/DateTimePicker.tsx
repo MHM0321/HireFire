@@ -1,12 +1,14 @@
-import React, { useState } from 'react';
-import { 
-  StyleSheet, 
-  View, 
-  Text, 
-  TouchableOpacity, 
-  Modal, 
-  TextInput,
-  Dimensions 
+import React, { useEffect, useRef, useState } from 'react';
+import {
+  StyleSheet,
+  View,
+  Text,
+  TouchableOpacity,
+  Modal,
+  ScrollView,
+  NativeSyntheticEvent,
+  NativeScrollEvent,
+  Dimensions
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 
@@ -23,21 +25,33 @@ type DateTimePickerProps = {
 
 type ViewMode = 'days' | 'months' | 'years';
 
-export const DateTimePicker: React.FC<DateTimePickerProps> = ({ 
-  onDateChange, 
-  initialDate = new Date() 
+export const DateTimePicker: React.FC<DateTimePickerProps> = ({
+  onDateChange,
+  initialDate = new Date()
 }) => {
   const [selectedDate, setSelectedDate] = useState(initialDate);
   const [displayDate, setDisplayDate] = useState(initialDate);
-  const [timeInput, setTimeInput] = useState('01:30');
   const [showCalendar, setShowCalendar] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>('days');
+  const [showTimePicker, setShowTimePicker] = useState(false);
+  const [tempHours, setTempHours] = useState(initialDate.getHours());
+  const [tempMinutes, setTempMinutes] = useState(initialDate.getMinutes());
+
+  // Constants for time picker
+  const ITEM_HEIGHT = 40;
+  const hours = Array.from({ length: 24 }, (_, i) => i);
+  const minutes = Array.from({ length: 60 }, (_, i) => i);
 
   // Format date for display
   const formatDate = (date: Date) => {
     const day = date.getDate();
     const month = MONTHS[date.getMonth()].substring(0, 3);
     return `${day} ${month}`;
+  };
+
+  // Format time for display
+  const formatTime = (hours: number, minutes: number) => {
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
   };
 
   // Get days in month
@@ -50,23 +64,18 @@ export const DateTimePicker: React.FC<DateTimePickerProps> = ({
     const year = displayDate.getFullYear();
     const month = displayDate.getMonth();
     const daysInMonth = getDaysInMonth(year, month);
-    
-    // Get the day of the week the month starts on (0 = Sunday)
     const firstDay = new Date(year, month, 1).getDay();
     
     const daysArray = [];
     
-    // Add empty spaces for days before the first day of the month
     for (let i = 0; i < firstDay; i++) {
       daysArray.push(null);
     }
     
-    // Add days of the month
     for (let i = 1; i <= daysInMonth; i++) {
       daysArray.push(i);
     }
     
-    // Add empty spaces at the end to complete the grid rows if needed
     const totalCells = Math.ceil((firstDay + daysInMonth) / 7) * 7;
     const remainingCells = totalCells - (firstDay + daysInMonth);
     for (let i = 0; i < remainingCells; i++) {
@@ -82,12 +91,10 @@ export const DateTimePicker: React.FC<DateTimePickerProps> = ({
     
     const newDate = new Date(displayDate);
     newDate.setDate(day);
-    setSelectedDate(newDate);
+    newDate.setHours(tempHours);
+    newDate.setMinutes(tempMinutes);
     
-    // Parse time and set it on the date
-    const [hours, minutes] = timeInput.split(':').map(Number);
-    newDate.setHours(hours || 0);
-    newDate.setMinutes(minutes || 0);
+    setSelectedDate(newDate);
     
     if (onDateChange) {
       onDateChange(newDate);
@@ -132,25 +139,34 @@ export const DateTimePicker: React.FC<DateTimePickerProps> = ({
     return years;
   };
 
-  // Handle time input change
-  const handleTimeChange = (text: string) => {
-    // Basic validation for time format
-    const timeRegex = /^([0-1]?[0-9]|2[0-3]):([0-5][0-9])$/;
+  // Handle time selection
+  const handleTimeSelect = () => {
+    const newDate = new Date(
+      selectedDate.getFullYear(),
+      selectedDate.getMonth(),
+      selectedDate.getDate(),
+      tempHours,
+      tempMinutes
+    );
     
-    if (text === '' || timeRegex.test(text)) {
-      setTimeInput(text);
-      
-      if (timeRegex.test(text)) {
-        const [hours, minutes] = text.split(':').map(Number);
-        const newDate = new Date(selectedDate);
-        newDate.setHours(hours);
-        newDate.setMinutes(minutes);
-        
-        if (onDateChange) {
-          onDateChange(newDate);
-        }
-      }
+    setSelectedDate(newDate);
+    setShowTimePicker(false);
+    
+    if (onDateChange) {
+      onDateChange(newDate);
     }
+  };
+
+  const handleHourScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const y = e.nativeEvent.contentOffset.y;
+    const index = Math.min(23, Math.max(0, Math.floor(y / ITEM_HEIGHT + 0.5)));
+    setTempHours(index);
+  };
+  
+  const handleMinuteScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const y = e.nativeEvent.contentOffset.y;
+    const index = Math.min(59, Math.max(0, Math.floor(y / ITEM_HEIGHT + 0.5)));
+    setTempMinutes(index);
   };
 
   const renderDaysView = () => {
@@ -271,6 +287,164 @@ export const DateTimePicker: React.FC<DateTimePickerProps> = ({
     );
   };
 
+  const renderTimePicker = () => {
+    const ITEM_HEIGHT = 50; // Increased height for better touch area
+    const VISIBLE_ITEMS = 5; // Number of items visible in the picker
+    const PICKER_HEIGHT = ITEM_HEIGHT * VISIBLE_ITEMS;
+  
+    // Refs for the scroll views
+    const hourScrollRef = useRef<ScrollView>(null);
+    const minuteScrollRef = useRef<ScrollView>(null);
+  
+    // Initialize scroll positions
+    useEffect(() => {
+      if (hourScrollRef.current) {
+        hourScrollRef.current.scrollTo({
+          y: tempHours * ITEM_HEIGHT,
+          animated: false,
+        });
+      }
+      if (minuteScrollRef.current) {
+        minuteScrollRef.current.scrollTo({
+          y: tempMinutes * ITEM_HEIGHT,
+          animated: false,
+        });
+      }
+    }, [showTimePicker]);
+  
+    const handleHourScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+      const y = e.nativeEvent.contentOffset.y;
+      const index = Math.min(23, Math.max(0, Math.round(y / ITEM_HEIGHT)));
+      setTempHours(index);
+    };
+  
+    const handleMinuteScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+      const y = e.nativeEvent.contentOffset.y;
+      const index = Math.min(59, Math.max(0, Math.round(y / ITEM_HEIGHT)));
+      setTempMinutes(index);
+    };
+  
+    const snapToHour = (index: number) => {
+      const safeIndex = Math.min(23, Math.max(0, index));
+      setTempHours(safeIndex);
+      hourScrollRef.current?.scrollTo({
+        y: safeIndex * ITEM_HEIGHT,
+        animated: true,
+      });
+    };
+    
+    const snapToMinute = (index: number) => {
+      const safeIndex = Math.min(59, Math.max(0, index));
+      setTempMinutes(safeIndex);
+      minuteScrollRef.current?.scrollTo({
+        y: safeIndex * ITEM_HEIGHT,
+        animated: true,
+      });
+    };
+  
+    return (
+      <Modal
+        visible={showTimePicker}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setShowTimePicker(false)}
+      >
+        <TouchableOpacity 
+          style={styles.timeModalOverlay}
+          activeOpacity={1}
+          onPress={() => setShowTimePicker(false)}
+        >
+          <View style={styles.timePickerContainer}>
+            <View style={styles.timePickerHeader}>
+              <Text style={styles.timePickerTitle}>Select Time</Text>
+            </View>
+            
+            <View style={[styles.pickerContainer, { height: PICKER_HEIGHT }]}>
+              <View style={styles.pickerColumn}>
+                <ScrollView
+                  ref={hourScrollRef}
+                  showsVerticalScrollIndicator={false}
+                  onScroll={handleHourScroll}
+                  scrollEventThrottle={16}
+                  snapToInterval={ITEM_HEIGHT}
+                  contentContainerStyle={styles.pickerContent}
+                  onMomentumScrollEnd={(e) => {
+                    const y = e.nativeEvent.contentOffset.y;
+                    const index = Math.round(y / ITEM_HEIGHT);
+                    snapToHour(index);
+                  }}
+                  decelerationRate="fast"
+                  bounces={false}
+                  style={{ height: PICKER_HEIGHT }}
+                >
+                  {hours.map((hour) => (
+                    <TouchableOpacity
+                      key={`hour-${hour}`}
+                      style={[styles.pickerItem, { height: ITEM_HEIGHT }]}
+                      onPress={() => snapToHour(hour)}
+                    >
+                      <Text style={[
+                        styles.pickerItemText,
+                        hour === tempHours ? styles.selectedPickerItemText : {}
+                      ]}>
+                        {hour.toString().padStart(2, '0')}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
+                <View style={styles.pickerHighlight} />
+              </View>
+              
+              <Text style={styles.timeSeparator}>:</Text>
+              
+              <View style={styles.pickerColumn}>
+                <ScrollView
+                  ref={minuteScrollRef}
+                  showsVerticalScrollIndicator={false}
+                  onScroll={handleMinuteScroll}
+                  scrollEventThrottle={16}
+                  snapToInterval={ITEM_HEIGHT}
+                  contentContainerStyle={styles.pickerContent}
+                  onMomentumScrollEnd={(e) => {
+                    const y = e.nativeEvent.contentOffset.y;
+                    const index = Math.round(y / ITEM_HEIGHT);
+                    snapToMinute(index);
+                  }}
+                  decelerationRate="fast"
+                  bounces={false}
+                  style={{ height: PICKER_HEIGHT }}
+                >
+                  {minutes.map((minute) => (
+                    <TouchableOpacity
+                      key={`minute-${minute}`}
+                      style={[styles.pickerItem, { height: ITEM_HEIGHT }]}
+                      onPress={() => snapToMinute(minute)}
+                    >
+                      <Text style={[
+                        styles.pickerItemText,
+                        minute === tempMinutes ? styles.selectedPickerItemText : {}
+                      ]}>
+                        {minute.toString().padStart(2, '0')}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
+                <View style={styles.pickerHighlight} />
+              </View>
+            </View>
+            
+            <TouchableOpacity 
+              style={styles.timePickerButton}
+              onPress={handleTimeSelect}
+            >
+              <Text style={styles.timePickerButtonText}>Set Time</Text>
+            </TouchableOpacity>
+          </View>
+        </TouchableOpacity>
+      </Modal>
+    );
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.inputRow}>
@@ -283,16 +457,14 @@ export const DateTimePicker: React.FC<DateTimePickerProps> = ({
           <Text style={styles.dateInputText}>{formatDate(selectedDate)}</Text>
         </TouchableOpacity>
         
-        <View style={styles.timeInputContainer}>
-          <TextInput
-            style={styles.timeInput}
-            value={timeInput}
-            onChangeText={handleTimeChange}
-            keyboardType="numbers-and-punctuation"
-            placeholder="HH:MM"
-            placeholderTextColor="#666"
-          />
-        </View>
+        <TouchableOpacity 
+          style={styles.timeInputContainer}
+          onPress={() => setShowTimePicker(true)}
+        >
+          <Text style={styles.timeInputText}>
+            {formatTime(selectedDate.getHours(), selectedDate.getMinutes())}
+          </Text>
+        </TouchableOpacity>
       </View>
       
       <Modal
@@ -317,6 +489,8 @@ export const DateTimePicker: React.FC<DateTimePickerProps> = ({
           </TouchableOpacity>
         </TouchableOpacity>
       </Modal>
+      
+      {renderTimePicker()}
     </View>
   );
 };
@@ -363,7 +537,7 @@ const styles = StyleSheet.create({
     shadowRadius: 2,
     elevation: 2,
   },
-  timeInput: {
+  timeInputText: {
     padding: 12,
     width: '100%',
     color: 'black',
@@ -413,7 +587,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   dayCell: {
-    width: '14.28%', // Exactly 1/7 of the container width
+    width: '14.28%',
     height: 36,
     justifyContent: 'center',
     alignItems: 'center',
@@ -470,5 +644,84 @@ const styles = StyleSheet.create({
   },
   selectedYearCell: {
     backgroundColor: '#FF4D4D',
+  },
+  timeModalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  timePickerContainer: {
+    backgroundColor: 'white',
+    borderRadius: 12,
+    padding: 20,
+    width: 300,
+  },
+  timePickerHeader: {
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  timePickerTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  pickerContainer: {//------------------------------------------------------
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  pickerColumn: {
+    flex: 1,
+    height: '100%',
+    position: 'relative',
+  },
+  pickerContent: {
+    paddingTop: 80,
+    paddingBottom: 80,
+  },
+  pickerItem: {
+    justifyContent: 'center', // This stays
+    alignItems: 'center', // This stays
+    height: 40, // Add explicit height matching highlight
+    marginVertical: 0, // Ensure no extra vertical spacing
+  },
+  pickerItemText: {
+    fontSize: 20,
+    color: '#666',
+  },
+  pickerHighlight: {
+    position: 'absolute',
+    top: '50%',
+    left: 0,
+    right: 0,
+    height: 40, // Make sure this matches pickerItem height
+    marginTop: -40, // Half of height (40/2)
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
+    borderColor: '#FF4D4D',
+    backgroundColor: 'rgba(255, 77, 77, 0.1)',
+  },
+  timeSeparator: {
+    fontSize: 24,
+    color: '#333',
+    marginHorizontal: 5,
+  },
+  timePickerButton: {
+    backgroundColor: '#FF4D4D',
+    padding: 12,
+    borderRadius: 6,
+    alignItems: 'center',
+  },
+  timePickerButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  selectedPickerItemText: {
+    color: '#FF4D4D',
+    fontWeight: 'bold',
+    fontSize: 24,
   },
 });
