@@ -9,6 +9,10 @@ import { useColorScheme } from "react-native";
 
 import { Slot } from "expo-router";
 import SidebarLayout from "../components/sidebarWrapper";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { Tabs } from "expo-router";
+import { Feather } from "@expo/vector-icons";
+const Tab = createBottomTabNavigator();
 
 const CustomDarkTheme = {
   ...DarkTheme,

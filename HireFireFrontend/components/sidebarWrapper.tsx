@@ -7,6 +7,7 @@ import {
 } from "react-native";
 import Sidebar from "./sidebar";
 import Header from "./header";
+import NavBar from "./navBar";
 
 const SidebarLayout: React.FC<{ children: React.ReactNode }> = ({
   children,
@@ -34,9 +35,8 @@ const SidebarLayout: React.FC<{ children: React.ReactNode }> = ({
   return (
     <View style={{ flex: 1 }}>
       <Header onMenuPress={openSidebar} />
-
       <View style={{ flex: 1 }}>{children}</View>
-
+      <NavBar />
       {sidebarVisible && (
         <TouchableWithoutFeedback onPress={closeSidebar}>
           <View style={StyleSheet.absoluteFill}>
