@@ -29,13 +29,13 @@ export default function homePageWorkerScreen() {
         </TouchableOpacity>
 
         {/* Change Availability Button */}
-        <TouchableOpacity
+        {/* <TouchableOpacity
           style={styles.gridButton}
           onPress={() => router.push("/workerAvailabilityPg")}
         >
           <Feather name="calendar" size={40} color="#FF4D4D" />
           <ThemedText style={styles.buttonText}>Change Availability</ThemedText>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
 
         {/* Preferred Location Button */}
         <TouchableOpacity
