@@ -3,12 +3,10 @@ package com.HireFire.HireFireBackend.model;
 import javax.persistence.*;
 import java.util.List;
 
-@Entity
-@Table(name = "customer")
+
 public class Customer {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+
     private Long id;
 
     private String name;
@@ -16,10 +14,10 @@ public class Customer {
     private String password;
     private String address;
 
-    @OneToMany(mappedBy = "customer")
+
     private List<Appointment> appointments;
 
-    @OneToMany(mappedBy = "customer")
+
     private List<Review> reviews;
 
     // Getters and setters (generate via IntelliJ)

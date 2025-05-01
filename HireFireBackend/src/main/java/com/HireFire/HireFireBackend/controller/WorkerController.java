@@ -1,3 +1,14 @@
+package com.HireFire.HireFireBackend.controller;
+
+import com.HireFire.HireFireBackend.model.Appointment;
+import com.HireFire.HireFireBackend.model.Worker;
+import com.HireFire.HireFireBackend.service.WorkerService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/workers")
 public class WorkerController {

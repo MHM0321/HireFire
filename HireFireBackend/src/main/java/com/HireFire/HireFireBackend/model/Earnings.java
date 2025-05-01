@@ -2,16 +2,13 @@ package com.HireFire.HireFireBackend.model;
 
 import javax.persistence.*;
 
-@Entity
-@Table(name = "earnings")
+
 public class Earnings {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "worker_id")
+
     private Worker worker;
 
     private double amount;

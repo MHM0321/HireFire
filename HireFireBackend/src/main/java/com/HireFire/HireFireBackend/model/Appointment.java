@@ -1,22 +1,18 @@
 package com.HireFire.HireFireBackend.model;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 
-@Entity
-@Table(name = "appointment")
+
+
 public class Appointment {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "worker_id")
+
     private Worker worker;
 
-    @ManyToOne
-    @JoinColumn(name = "customer_id")
+
     private Customer customer;
 
     private String dateTime;  // ISO format: "2025-05-01T14:30"

@@ -2,20 +2,16 @@ package com.HireFire.HireFireBackend.model;
 
 import javax.persistence.*;
 
-@Entity
-@Table(name = "review")
+
 public class Review {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "worker_id")
+
     private Worker worker;
 
-    @ManyToOne
-    @JoinColumn(name = "customer_id")
+
     private Customer customer;
 
     private int rating;  // 1-5

@@ -4,7 +4,13 @@ import com.HireFire.HireFireBackend.model.Chat;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
-public interface ChatRepository extends JpaRepository<Chat, Long> {
-    List<Chat> findByWorkerIdAndCustomerIdOrderByTimestampAsc(Long workerId, Long customerId);
-    List<Chat> findByWorkerId(Long workerId); // Get all chats for a worker
+public class ChatRepository {
+    List<Chat> findByWorkerIdAndCustomerIdOrderByTimestampAsc(Long workerId, Long customerId) {
+        return null;
+    }
+
+    List<Chat> findByWorkerId(Long workerId) // Get all chats for a worker
+    {
+        return null;
+    }
 }

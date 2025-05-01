@@ -3,20 +3,16 @@ package com.HireFire.HireFireBackend.model;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
-@Entity
-@Table(name = "chat")
+
 public class Chat {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "worker_id")
+
     private Worker worker;
 
-    @ManyToOne
-    @JoinColumn(name = "customer_id")
+
     private Customer customer;
 
     private String message;

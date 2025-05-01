@@ -3,12 +3,10 @@ package com.HireFire.HireFireBackend.model;
 import javax.persistence.*;
 import java.util.List;
 
-@Entity
-@Table(name = "worker")
+
 public class Worker {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+
     private Long id;
 
     private String name;
@@ -94,7 +92,7 @@ public class Worker {
     private String bankAccount;  // For earnings withdrawal
 
     // Relationships
-    @OneToMany(mappedBy = "worker")
+
     private List<Appointment> appointments;
 
     // Getters and Setters
