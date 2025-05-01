@@ -1,34 +1,53 @@
 package com.HireFire.HireFireBackend.model;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.List;
 
 @Entity
-@Table(name = "customer")
+@Table(name = "customers")
 public class Customer {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
     private String name;
     private String email;
     private String password;
+    private String phone;
     private String address;
+    private String createdAt;
 
-    @OneToMany(mappedBy = "customer")
-    private List<Appointment> appointments;
+    // Relationships with Workers
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
+    private List<WorkRequest> workRequests;
 
-    @OneToMany(mappedBy = "customer")
-    private List<Review> reviews;
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
+    private List<Client> workerClients;
 
-    // Getters and setters (generate via IntelliJ)
+    // Relationships with Consultants
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
+    private List<ConsultationRequest> consultationRequests;
 
-    public Long getId() {
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
+    private List<ConsultantClient> consultantClients;
+
+    // Constructors
+    public Customer() {}
+
+    public Customer(String name, String email, String password, String phone, String address) {
+        this.name = name;
+        this.email = email;
+        this.password = password;
+        this.phone = phone;
+        this.address = address;
+    }
+
+    // Getters and Setters
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -56,6 +75,14 @@ public class Customer {
         this.password = password;
     }
 
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
     public String getAddress() {
         return address;
     }
@@ -64,19 +91,56 @@ public class Customer {
         this.address = address;
     }
 
-    public List<Appointment> getAppointments() {
-        return appointments;
+    public String getCreatedAt() {
+        return createdAt;
     }
 
-    public void setAppointments(List<Appointment> appointments) {
-        this.appointments = appointments;
+    public void setCreatedAt(String createdAt) {
+        this.createdAt = createdAt;
     }
 
-    public List<Review> getReviews() {
-        return reviews;
+    // Worker-related relationships
+    public List<WorkRequest> getWorkRequests() {
+        return workRequests;
     }
 
-    public void setReviews(List<Review> reviews) {
-        this.reviews = reviews;
+    public void setWorkRequests(List<WorkRequest> workRequests) {
+        this.workRequests = workRequests;
+    }
+
+    public List<Client> getWorkerClients() {
+        return workerClients;
+    }
+
+    public void setWorkerClients(List<Client> workerClients) {
+        this.workerClients = workerClients;
+    }
+
+    // Consultant-related relationships
+    public List<ConsultationRequest> getConsultationRequests() {
+        return consultationRequests;
+    }
+
+    public void setConsultationRequests(List<ConsultationRequest> consultationRequests) {
+        this.consultationRequests = consultationRequests;
+    }
+
+    public List<ConsultantClient> getConsultantClients() {
+        return consultantClients;
+    }
+
+    public void setConsultantClients(List<ConsultantClient> consultantClients) {
+        this.consultantClients = consultantClients;
+    }
+
+    // Utility Methods
+    @Override
+    public String toString() {
+        return "Customer{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", email='" + email + '\'' +
+                ", phone='" + phone + '\'' +
+                '}';
     }
 }
