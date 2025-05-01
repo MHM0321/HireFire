@@ -16,6 +16,6 @@ public class HireFireBackendApplication
 		//the front end for functioning of stuff
 
 
-		//now I dont know if we can actually do this, or do this to how much of extent
+		//now I don't know if we can actually do this, or do this to how much of extent
 	}
 }
