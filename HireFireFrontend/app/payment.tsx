@@ -41,7 +41,7 @@ export default function PaymentScreen() {
 
       await Linking.openURL(jazzCashUrl);
     } catch (error) {
-      alert(`Payment Error: ${error.message}`);
+      //alert(`Payment Error: ${error.message}`);
     } finally {
       setIsLoading(false);
     }

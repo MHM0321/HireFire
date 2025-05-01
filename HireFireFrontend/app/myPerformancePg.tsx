@@ -12,6 +12,7 @@ import { FontAwesome5, MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { PieChart } from "react-native-chart-kit";
 import { Dimensions } from "react-native";
+import React from "react";
 
 export default function MyPerformancePg() {
   const router = useRouter();
