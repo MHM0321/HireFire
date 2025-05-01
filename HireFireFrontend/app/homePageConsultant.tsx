@@ -4,7 +4,7 @@ import { useRouter } from "expo-router/build/exports";
 import { ThemedText } from "@/components/ThemedText";
 import { MaterialCommunityIcons, FontAwesome6, Feather } from "@expo/vector-icons";
 
-export default function homePageWorkerScreen() {
+export default function homePageConsultantScreen() {
   const router = useRouter();
 
   return (
@@ -38,13 +38,13 @@ export default function homePageWorkerScreen() {
         </TouchableOpacity>
 
         {/* Preferred Location Button */}
-        <TouchableOpacity
+        {/* <TouchableOpacity
           style={styles.gridButton}
           onPress={() => router.push("/workerPreferredLocationPg")}
         >
           <MaterialCommunityIcons name="map-marker-radius" size={40} color="#FF4D4D" />
           <ThemedText style={styles.buttonText}>Preferred Location</ThemedText>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </ScrollView>
     </SafeAreaView>
   );

@@ -44,7 +44,7 @@ const { userId } = useLocalSearchParams();
             style={styles.lottie}
           />
 
-          <TouchableOpacity style={styles.button} onPress={() => router.push({ pathname: '/customerPgC', params:{} })}>
+          <TouchableOpacity style={styles.button} onPress={() => router.push({ pathname: '/homePageCustomer', params:{} })}>
             <Text style={styles.buttonText}>Home</Text>
           </TouchableOpacity>
 

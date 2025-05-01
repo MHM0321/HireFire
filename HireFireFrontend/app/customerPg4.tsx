@@ -53,7 +53,7 @@ export default function CustomerPgScreen() {
 
           <TouchableOpacity
             style={styles.button}
-            onPress={() => router.push({ pathname: "/customerPg", params: {} })}
+            onPress={() => router.push({ pathname: "/homePageCustomer", params: {} })}
           >
             <Text style={styles.buttonText}>Home</Text>
           </TouchableOpacity>

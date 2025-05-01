@@ -2,49 +2,49 @@ import React from "react";
 import { StyleSheet, View, TouchableOpacity, SafeAreaView, ScrollView } from "react-native";
 import { useRouter } from "expo-router/build/exports";
 import { ThemedText } from "@/components/ThemedText";
-import { MaterialCommunityIcons, FontAwesome6, Feather } from "@expo/vector-icons";
+import { MaterialCommunityIcons, FontAwesome6, Feather, FontAwesome } from "@expo/vector-icons";
 
-export default function homePageWorkerScreen() {
+export default function homePageCustomerScreen() {
   const router = useRouter();
 
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
+        {/* Hire a Worker Button */}
+        <TouchableOpacity
+          style={styles.gridButton}
+          onPress={() => router.push("/customerPg")}
+        >
+          <FontAwesome name="user-circle" size={40} color="#FF4D4D" />
+          <ThemedText style={styles.buttonText}>Hire a Worker</ThemedText>
+        </TouchableOpacity>
+
+        {/* Hire a Consultant Button */}
+        <TouchableOpacity
+          style={styles.gridButton}
+          onPress={() => router.push("/customerPgC")}
+        >
+          <FontAwesome6 name="user-tie" size={40} color="#FF4D4D" />
+          <ThemedText style={styles.buttonText}>Hire a Consultant</ThemedText>
+        </TouchableOpacity>
+
         {/* Pending Requests Button */}
         <TouchableOpacity
           style={styles.gridButton}
-          onPress={() => router.push("/appointmentsPg")}
+          onPress={() => router.push("/customerPendingRequests")}
         >
           <MaterialCommunityIcons name="clock-outline" size={40} color="#FF4D4D" />
           <ThemedText style={styles.buttonText}>Pending Requests</ThemedText>
         </TouchableOpacity>
 
-        {/* Accepted Requests Button */}
-        <TouchableOpacity
+        {/* My Bookings Button */}
+        {/* <TouchableOpacity
           style={styles.gridButton}
-          onPress={() => router.push("/myClientsPg")}
+          onPress={() => router.push("/myBookingsPg")}
         >
-          <FontAwesome6 name="clipboard-check" size={40} color="#FF4D4D" />
-          <ThemedText style={styles.buttonText}>Accepted Requests</ThemedText>
-        </TouchableOpacity>
-
-        {/* Change Availability Button */}
-        <TouchableOpacity
-          style={styles.gridButton}
-          onPress={() => router.push("/workerAvailabilityPg")}
-        >
-          <Feather name="calendar" size={40} color="#FF4D4D" />
-          <ThemedText style={styles.buttonText}>Change Availability</ThemedText>
-        </TouchableOpacity>
-
-        {/* Preferred Location Button */}
-        <TouchableOpacity
-          style={styles.gridButton}
-          onPress={() => router.push("/workerPreferredLocationPg")}
-        >
-          <MaterialCommunityIcons name="map-marker-radius" size={40} color="#FF4D4D" />
-          <ThemedText style={styles.buttonText}>Preferred Location</ThemedText>
-        </TouchableOpacity>
+          <FontAwesome6 name="book" size={40} color="#FF4D4D" />
+          <ThemedText style={styles.buttonText}>My Bookings</ThemedText>
+        </TouchableOpacity> */}
       </ScrollView>
     </SafeAreaView>
   );
@@ -59,10 +59,10 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     padding: 20,
     gap: 20,
-    alignItems: 'center', // This centers items horizontally
+    alignItems: 'center',
   },
   gridButton: {
-    width: "80%", // Reduced from 100% to make buttons smaller
+    width: "80%",
     aspectRatio: 1,
     backgroundColor: "#FFFFFF",
     borderRadius: 12,
