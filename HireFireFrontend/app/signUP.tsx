@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Switch } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons'; // Import Ionicons from Expo
+import { BASE_URL } from '@/config';
 
 const Signup = () => {
   const [name, setName] = useState('');
@@ -35,8 +36,8 @@ const Signup = () => {
 
     //Use different API endpoints based on whether signing up as worker or user
     const apiUrl = isWorker
-        ? 'http://192.168.0.8:8080/api/auth/worker/signup'
-        : 'http://192.168.0.8:8080/api/auth/signup';
+        ? BASE_URL + 'api/auth/worker/signup'
+        : BASE_URL + 'api/auth/signup';
 
     const userData = {
       name: name,
@@ -103,7 +104,8 @@ const Signup = () => {
 
   // Handler to navigate to appropriate login page
   const goToLogin = () => {
-    router.push(isWorker ? ('/worker/login' as any) : '/login');
+    router.back();
+    // router.push(isWorker ? ('/worker/login' as any) : '/login');
   };
 
   // Toggle password visibility handlers
@@ -136,6 +138,7 @@ const Signup = () => {
         <TextInput
             style={styles.input}
             placeholder="Name"
+            placeholderTextColor="grey"
             value={name}
             onChangeText={setName}
         />
@@ -143,6 +146,7 @@ const Signup = () => {
         <TextInput
             style={styles.input}
             placeholder="Email"
+            placeholderTextColor="grey"
             value={email}
             onChangeText={setEmail}
             keyboardType="email-address"
@@ -154,6 +158,7 @@ const Signup = () => {
           <TextInput
               style={styles.passwordInput}
               placeholder="Password"
+              placeholderTextColor="grey"
               value={password}
               onChangeText={setPassword}
               secureTextEntry={!showPassword}
@@ -175,6 +180,7 @@ const Signup = () => {
           <TextInput
               style={styles.passwordInput}
               placeholder="Confirm Password"
+              placeholderTextColor="grey"
               value={confirmPassword}
               onChangeText={setConfirmPassword}
               secureTextEntry={!showConfirmPassword}
@@ -285,7 +291,7 @@ const styles = StyleSheet.create({
   button: {
     width: '100%',
     height: 50,
-    backgroundColor: '#007BFF',
+    backgroundColor: '#E45959',
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 8,
@@ -303,7 +309,7 @@ const styles = StyleSheet.create({
     color: '#333',
   },
   loginLink: {
-    color: '#007BFF',
+    color: '#E45959',
     fontWeight: 'bold',
   },
 });

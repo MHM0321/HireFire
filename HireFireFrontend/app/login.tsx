@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Switch } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Switch, Image } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons'; // Import Ionicons from Expo
+import { BASE_URL } from '@/config';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -25,8 +26,8 @@ const Login = () => {
   
     // Choose the appropriate API endpoint based on account type
     const apiUrl = isWorker 
-      ? 'http://192.168.0.8:8080/api/auth/worker/login' 
-      : 'http://192.168.0.8:8080/api/auth/login';
+      ? BASE_URL + 'api/auth/worker/login' 
+      : BASE_URL + 'api/auth/login';
     
     const userData = {
       email: email.trim(),
@@ -65,9 +66,9 @@ const Login = () => {
       // Clear form after successful login
       setEmail('');
       setPassword('');
-    } catch (error) {
+    } catch (error: any) {
       setErrorMessage('An unexpected error occurred');
-      Alert.alert('Error', 'An unexpected error occurred');
+      Alert.alert('Error', 'An unexpected error occurred: ' + error.message);
     }
   };
 
@@ -78,6 +79,13 @@ const Login = () => {
 
   return (
     <View style={styles.container}>
+      {/* <View style={styles.centerContainer}>
+        <Image
+          source={require('@/assets/images/logoText.png')}
+          style={styles.logoImage}
+          resizeMode="contain"
+        />
+      </View> */}
       <Text style={styles.title}>Login</Text>
 
       {/* Display error message if there is one */}
@@ -97,6 +105,7 @@ const Login = () => {
       <TextInput
         style={styles.input}
         placeholder="Email"
+        placeholderTextColor="grey"
         value={email}
         onChangeText={setEmail}
         keyboardType="email-address"
@@ -108,6 +117,7 @@ const Login = () => {
         <TextInput
           style={styles.passwordInput}
           placeholder="Password"
+          placeholderTextColor="grey"
           value={password}
           onChangeText={setPassword}
           secureTextEntry={!showPassword}
@@ -218,7 +228,7 @@ const styles = StyleSheet.create({
   button: {
     width: '100%',
     height: 50,
-    backgroundColor: '#007BFF',
+    backgroundColor: '#E45959',
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 8,
@@ -236,8 +246,17 @@ const styles = StyleSheet.create({
     color: '#333',
   },
   signupLink: {
-    color: '#007BFF',
+    color: '#E45959',
     fontWeight: 'bold',
+  },
+  centerContainer: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  logoImage: {
+    width: 120,
+    height: 60,
   },
 });
 
