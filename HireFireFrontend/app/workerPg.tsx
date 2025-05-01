@@ -1,40 +1,26 @@
-import { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, TextInput, Image, ScrollView, Animated } from 'react-native';
-import { ThemedView } from '@/components/ThemedView';
-import { DateTimePicker } from '@/components/DateTimePicker';
-import { Feather } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
+//potato
+import { useState, useEffect } from "react";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  TextInput,
+  Image,
+  ScrollView,
+  Animated,
+} from "react-native";
+import { ThemedView } from "@/components/ThemedView";
+import { DateTimePicker } from "@/components/DateTimePicker";
+import { Feather } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 
 export default function WorkerScreen() {
-  const [location, setLocation] = useState('');
+  const [location, setLocation] = useState("");
   const router = useRouter();
-
-  const mockRequests = [
-    { title: 'Fix Kitchen Sink', details: 'April 30, 3:00 PM - 5:00 PM, Location: XYZ Street' },
-    { title: 'Install Light Fixtures', details: 'May 1, 10:00 AM - 12:00 PM, Location: ABC Avenue' },
-  ];
 
   return (
     <ThemedView style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.headerButton}>
-          <Feather name="menu" size={24} color="#FFFFFF" />
-        </TouchableOpacity>
-
-        <View style={styles.logoContainer}>
-          <Image
-            source={require('@/assets/images/logoText.png')}
-            style={styles.logo}
-            resizeMode="contain"
-          />
-        </View>
-
-        <TouchableOpacity style={styles.headerButton}>
-          <Feather name="user" size={24} color="#FFFFFF" />
-        </TouchableOpacity>
-      </View>
-
       {/* Main Content */}
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.welcomeSection}>
@@ -44,7 +30,12 @@ export default function WorkerScreen() {
         {/* Search */}
         <View style={styles.searchContainer}>
           <View style={styles.searchBar}>
-            <Feather name="search" size={20} color="#666666" style={styles.searchIcon} />
+            <Feather
+              name="search"
+              size={20}
+              color="#666666"
+              style={styles.searchIcon}
+            />
             <TextInput
               style={styles.searchInput}
               placeholder="Set Location"
@@ -55,76 +46,47 @@ export default function WorkerScreen() {
           </View>
         </View>
 
-        {/* Availability Section */}
+        {/* Date Picker */}
         <View style={styles.dateTimeSection}>
-  <Text style={styles.sectionHeader}>Set Your Availability</Text>
-  <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-    <View style={{ flex: 1, marginRight: 8 }}>
-      <Text style={styles.timeLabel}>From:</Text>
-      <DateTimePicker mode="time" />
-    </View>
-    <View style={{ flex: 1, marginLeft: 8 }}>
-      <Text style={styles.timeLabel}>To:</Text>
-      <DateTimePicker mode="time" />
-    </View>
-  </View>
-</View>
-
-
-        {/* Work Requests Section */}
-        <View style={styles.requestsSection}>
-          <Text style={styles.sectionHeader}>Work Requests</Text>
-          {mockRequests.map((req, index) => (
-            <View key={index} style={styles.requestCard}>
-              <Text style={styles.requestTitle}>{req.title}</Text>
-              <Text style={styles.requestDetail}>{req.details}</Text>
-              <View style={styles.buttonRow}>
-                <TouchableOpacity style={styles.acceptButton}>
-                  <Text style={styles.buttonText}>Accept</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.declineButton}>
-                  <Text style={styles.buttonText}>Decline</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          ))}
+          <Text style={styles.sectionHeader}>Select Date and Time</Text>
+          <DateTimePicker />
         </View>
 
         {/* Features */}
         <View style={styles.featuresGrid}>
-          <FeatureCard 
+          <FeatureCard
             iconName="calendar"
             title="Available Appointments"
             subtitle="View work requests"
-            onPress={() => router.push('/appointmentsPg')}
+            onPress={() => router.push("/appointmentsPg")}
           />
-          
-          <FeatureCard 
+
+          <FeatureCard
             iconName="briefcase"
             title="My Clients"
             subtitle="Manage current clients"
-            onPress={() => router.push('/myClientsPg')}
+            onPress={() => router.push("/myClientsPg")}
           />
-          
-          <FeatureCard 
+
+          <FeatureCard
             iconName="bar-chart"
             title="My Performance"
             subtitle="View your statistics"
-            onPress={() => router.push('/myPerformancePg')}
+            onPress={() => router.push("/myPerformancePg")}
           />
-          
-          <FeatureCard 
+
+          <FeatureCard
             iconName="edit-3"
             title="Rate and Review"
             subtitle="Review past clients"
-            onPress={() => router.push('/rateAndReviewPg')}
+            onPress={() => router.push("/rateAndReviewPg")}
           />
-          
-          <FeatureCard 
+
+          <FeatureCard
             iconName="dollar-sign"
             title="Earnings"
             subtitle="Withdraw your money"
-            onPress={() => router.push('/earningsPg')}
+            onPress={() => router.push("/earningsPg")}
           />
         </View>
       </ScrollView>
@@ -133,7 +95,17 @@ export default function WorkerScreen() {
 }
 
 // Reusable Feature Card Component
-const FeatureCard = ({ iconName, title, subtitle, onPress }: { iconName: any, title: string, subtitle: string, onPress: () => void }) => {
+const FeatureCard = ({
+  iconName,
+  title,
+  subtitle,
+  onPress,
+}: {
+  iconName: any;
+  title: string;
+  subtitle: string;
+  onPress: () => void;
+}) => {
   const glowAnim = useState(new Animated.Value(0))[0];
 
   useEffect(() => {
@@ -167,8 +139,19 @@ const FeatureCard = ({ iconName, title, subtitle, onPress }: { iconName: any, ti
   return (
     <Animated.View style={[styles.featureCard, animatedStyle]}>
       <TouchableOpacity onPress={onPress}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
-          <Feather name={iconName} size={20} color="#FF0000" style={{ marginRight: 8 }} />
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            marginBottom: 8,
+          }}
+        >
+          <Feather
+            name={iconName}
+            size={20}
+            color="#FF0000"
+            style={{ marginRight: 8 }}
+          />
           <Text style={styles.featureTitle}>{title}</Text>
         </View>
         <Text style={styles.featureSubtitle}>{subtitle}</Text>
@@ -181,31 +164,12 @@ const FeatureCard = ({ iconName, title, subtitle, onPress }: { iconName: any, ti
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1D1D1D',
+    backgroundColor: "#1D1D1D",
   },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 38,
-    backgroundColor: '#1A0D0E',
-  },
-  headerButton: {
-    width: 40,
-    alignItems: 'center',
-  },
-  logoContainer: {
-    flex: 1,
-    alignItems: 'center',
-  },
-  logo: {
-    width: 120,
-    height: 60,
-  },
+
   content: {
     flexGrow: 1,
-    backgroundColor: '#F5F0F0',
+    backgroundColor: "#F5F0F0",
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     paddingTop: 20,
@@ -216,9 +180,9 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   searchBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#FFFFFF",
     borderRadius: 50,
     paddingHorizontal: 16,
     paddingVertical: 4,
@@ -229,7 +193,7 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     fontSize: 16,
-    color: '#333333',
+    color: "#333333",
   },
   welcomeSection: {
     paddingHorizontal: 16,
@@ -237,8 +201,8 @@ const styles = StyleSheet.create({
   },
   welcomeText: {
     fontSize: 24,
-    fontWeight: 'bold',
-    color: '#333333',
+    fontWeight: "bold",
+    color: "#333333",
   },
   dateTimeSection: {
     paddingHorizontal: 16,
@@ -246,83 +210,35 @@ const styles = StyleSheet.create({
   },
   sectionHeader: {
     fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333333',
+    fontWeight: "bold",
+    color: "#333333",
     marginBottom: 12,
-    textAlign: 'center',
+    textAlign: "center",
   },
   featuresGrid: {
     paddingHorizontal: 16,
     gap: 16,
   },
   featureCard: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "#FFFFFF",
     borderRadius: 12,
     padding: 20,
     borderWidth: 2,
-    borderColor: '#FF0000',
-    shadowColor: '#FF0000',
+    borderColor: "#FF0000",
+    shadowColor: "#FF0000",
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.5,
     shadowRadius: 10,
-    elevation: 10,
+    elevation: 10, // for Android glow
     marginBottom: 10,
   },
   featureTitle: {
     fontSize: 18,
-    fontWeight: '600',
-    color: '#333333',
+    fontWeight: "600",
+    color: "#333333",
   },
   featureSubtitle: {
     fontSize: 14,
-    color: '#666666',
-  },
-  requestsSection: {
-    paddingHorizontal: 16,
-    marginBottom: 30,
-  },
-  requestCard: {
-    backgroundColor: '#FFFFFF',
-    padding: 16,
-    borderRadius: 12,
-    borderWidth: 2,
-    borderColor: '#FF0000',
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    marginBottom: 12,
-  },
-  requestTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 4,
-  },
-  requestDetail: {
-    fontSize: 14,
-    color: '#666',
-    marginBottom: 12,
-  },
-  buttonRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  acceptButton: {
-    backgroundColor: '#28a745',
-    padding: 10,
-    borderRadius: 8,
-    flex: 0.48,
-    alignItems: 'center',
-  },
-  declineButton: {
-    backgroundColor: '#dc3545',
-    padding: 10,
-    borderRadius: 8,
-    flex: 0.48,
-    alignItems: 'center',
-  },
-  buttonText: {
-    color: '#fff',
-    fontWeight: 'bold',
+    color: "#666666",
   },
 });
