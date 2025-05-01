@@ -9,7 +9,7 @@ const NavBar = () => {
   return (
     //sample routes until we make the required screens
     <View style={styles.navBar}>
-      <TouchableOpacity onPress={() => router.push("/customerPg")}>
+      <TouchableOpacity onPress={() => router.push("/custHomePage")}>
         <View style={styles.iconWrapper}>
           <Feather name="home" size={24} color="#1A0D0E" />
         </View>

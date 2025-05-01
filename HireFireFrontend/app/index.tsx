@@ -5,7 +5,7 @@ import { Redirect } from "expo-router";
 import React from "react";
 
 export default function Index() {
-  return <Redirect href="/customerPgC" />; //un-comment to make it work
+  return <Redirect href="/custHomePage" />; //un-comment to make it work
   //put name of any page you want to see on the screen as the first thing you want to see when app opens
   //just replace customerPg1 with your desired page name and un-comment the line
   //DO turn it back after changes to avoid conflicts

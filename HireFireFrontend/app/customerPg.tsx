@@ -15,8 +15,8 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { FontAwesome6 } from "@expo/vector-icons";
 import { Image } from "react-native";
 import { DateTimePicker } from "@/components/DateTimePicker";
-import { LocationSearch } from '@/components/LocationSearch';
-import { LocationMapModal } from '@/components/LocationMapModal';
+import { LocationSearch } from "@/components/LocationSearch";
+import { LocationMapModal } from "@/components/LocationMapModal";
 
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
@@ -51,7 +51,6 @@ export default function CustomerPgScreen() {
   // Function to handle category selection
   const handleCategorySelect = (index: number) => {
     setSelectedCategory(index);
-    
   };
 
   // Function to navigate to the next page
@@ -62,7 +61,7 @@ export default function CustomerPgScreen() {
       date: selectedDate,
       location: selectedLocation.display_name,
       lat: selectedLocation.lat,
-      lon: selectedLocation.lon
+      lon: selectedLocation.lon,
     });
 
     // Navigate to the next page with params (replace with your actual route)
@@ -75,25 +74,24 @@ export default function CustomerPgScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      {/* Location Search */}
+      <LocationSearch
+        onLocationSelect={(location) => {
+          setSelectedLocation(location);
+          setShowMapModal(true);
+        }}
+      />
 
-         {/* Location Search */}
-         <LocationSearch
-          onLocationSelect={(location) => {
-            setSelectedLocation(location);
-            setShowMapModal(true);
-          }}
-        />
-
-        {/* Selected Location Preview */}
-        {selectedLocation && (
-          <TouchableOpacity
-            style={styles.selectedLocation}
-            onPress={() => setShowMapModal(true)}
-          >
-            <ThemedText>{selectedLocation.display_name}</ThemedText>
-            <Feather name="map-pin" size={16} color="#FF4D4D" />
-          </TouchableOpacity>
-        )}
+      {/* Selected Location Preview */}
+      {selectedLocation && (
+        <TouchableOpacity
+          style={styles.selectedLocation}
+          onPress={() => setShowMapModal(true)}
+        >
+          <ThemedText>{selectedLocation.display_name}</ThemedText>
+          <Feather name="map-pin" size={16} color="#FF4D4D" />
+        </TouchableOpacity>
+      )}
 
       <ScrollView style={styles.contentContainer}>
         {/* DateTime */}
@@ -160,7 +158,6 @@ export default function CustomerPgScreen() {
           </View>
         </View>
       </ScrollView>
-
 
       {/* Map Modal */}
       <LocationMapModal
@@ -307,10 +304,10 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
   selectedLocation: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: '#FFF',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    backgroundColor: "#FFF",
     padding: 16,
     borderRadius: 8,
     marginHorizontal: 16,
