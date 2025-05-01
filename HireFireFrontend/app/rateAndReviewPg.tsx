@@ -10,8 +10,9 @@ import {
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { FontAwesome5, MaterialIcons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
+import { useRouter } from "expo-router/build/exports";
 import { useState } from "react";
+import React from "react";
 
 interface Client {
   id: string;

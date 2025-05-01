@@ -10,7 +10,7 @@ import {
   Image,
 } from "react-native";
 import Feather from "react-native-vector-icons/Feather";
-import { router } from "expo-router";
+import { router } from "expo-router/build/exports";
 //import { useNavigation } from "@react-navigation/native";
 
 const FeedbackForm = () => {

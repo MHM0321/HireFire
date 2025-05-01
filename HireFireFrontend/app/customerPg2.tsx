@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import usersData from '@/assets/data/exampleUsers.json';
 import { Feather, FontAwesome } from '@expo/vector-icons';
-import { router } from 'expo-router';
+import { router } from 'expo-router/build/exports';
 import { ThemedText } from '@/components/ThemedText';
 
 // Define TypeScript interface for user data

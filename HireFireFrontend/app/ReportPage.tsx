@@ -9,7 +9,7 @@ import {
   Platform,
   ScrollView,
 } from "react-native";
-import { router } from "expo-router";
+import { router } from "expo-router/build/exports";
 
 type ReportReason = "misconduct" | "confusing" | "overcharge" | "other" | null;
 

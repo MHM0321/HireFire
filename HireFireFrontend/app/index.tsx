@@ -1,7 +1,7 @@
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
-import { useRouter } from "expo-router";
+import { useRouter } from "expo-router/build/exports";
 
-import { Redirect } from "expo-router";
+import { Redirect } from "expo-router/build/exports";
 import React from "react";
 
 export default function Index() {

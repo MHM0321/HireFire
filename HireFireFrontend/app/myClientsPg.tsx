@@ -10,7 +10,8 @@ import {
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { ThemedView } from "@/components/ThemedView";
-import { useRouter } from "expo-router";
+import { useRouter } from "expo-router/build/exports";
+import React from "react";
 
 export default function MyClientsScreen() {
   const router = useRouter();
