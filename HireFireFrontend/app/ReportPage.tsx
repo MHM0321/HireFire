@@ -9,7 +9,6 @@ import {
   Platform,
   ScrollView,
 } from "react-native";
-import Header from "@/app/header";
 import { router } from "expo-router";
 
 type ReportReason = "misconduct" | "confusing" | "overcharge" | "other" | null;
@@ -36,13 +35,14 @@ const ReportScreen: React.FC = () => {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={styles.container}
     >
-      <Header onMenuPress={() => router.back()} />
       <ScrollView contentContainerStyle={styles.innerContainer}>
         <View style={styles.headerRow}>
           <TouchableOpacity>
             <Text style={styles.title}>Report</Text>
           </TouchableOpacity>
-          <Text style={styles.cancelText}>cancel</Text>
+          <TouchableOpacity onPress={() => router.push("/ReviewPg")}>
+            <Text style={styles.cancelText}>cancel</Text>
+          </TouchableOpacity>
         </View>
 
         <Text style={styles.question}>What do you wish to report?</Text>

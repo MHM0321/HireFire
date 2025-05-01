@@ -12,8 +12,9 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
 } from "react-native";
-import Header from "@/app/header";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+import { useRouter } from "expo-router";
+const router = useRouter();
 
 const FeedbackScreen = () => {
   const [feedback, setFeedback] = useState("");
@@ -31,11 +32,6 @@ const FeedbackScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Header
-        onMenuPress={() => console.log("Menu")}
-        onProfilePress={() => console.log("Profile")}
-      />
-
       <KeyboardAvoidingView
         style={styles.flex}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -49,7 +45,7 @@ const FeedbackScreen = () => {
             <View style={styles.content}>
               <View style={styles.header}>
                 <Text style={styles.title}>Feedback</Text>
-                <TouchableOpacity>
+                <TouchableOpacity onPress={() => router.push("/ReviewPg")}>
                   <Text style={styles.cancelText}>cancel</Text>
                 </TouchableOpacity>
               </View>

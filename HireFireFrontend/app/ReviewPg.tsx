@@ -33,7 +33,7 @@ const FeedbackForm = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Header */}
+      {/* Header
       <View style={styles.header}>
         <TouchableOpacity
           style={styles.leftContainer}
@@ -56,7 +56,7 @@ const FeedbackForm = () => {
         >
           <Feather name="user" size={24} color="#FFFFFF" />
         </TouchableOpacity>
-      </View>
+      </View> */}
 
       {/* Feedback Options */}
       <View style={styles.content}>
@@ -146,14 +146,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#F5EDEE",
   },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 16,
-    paddingVertical: 38,
-    backgroundColor: "#1A0D0E",
-  },
+
   leftContainer: {
     width: 40,
     alignItems: "flex-start",

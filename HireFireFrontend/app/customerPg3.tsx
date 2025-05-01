@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
   View,
   Text,
@@ -7,50 +7,26 @@ import {
   StyleSheet,
   SafeAreaView,
   ScrollView,
-} from 'react-native';
-import usersData from '@/assets/data/exampleUsers.json';
-import { Feather } from '@expo/vector-icons';
-import { useRouter, useLocalSearchParams } from 'expo-router';
+} from "react-native";
+import usersData from "@/assets/data/exampleUsers.json";
+import { Feather } from "@expo/vector-icons";
+import { useRouter, useLocalSearchParams } from "expo-router";
 
 export default function CustomerPg3Screen() {
   const router = useRouter();
   const { userId } = useLocalSearchParams();
-  const user = usersData.find(u => u.id === Number(userId));
+  const user = usersData.find((u) => u.id === Number(userId));
 
   if (!user) {
     return (
       <SafeAreaView style={styles.container}>
-        <Text style={{ color: 'black', padding: 20 }}>User not found.</Text>
+        <Text style={{ color: "black", padding: 20 }}>User not found.</Text>
       </SafeAreaView>
     );
   }
 
   return (
     <SafeAreaView style={styles.container}>
-              {/* Header */}
-            <View style={styles.header}>
-              {/* Left: Hamburger */}
-              <TouchableOpacity style={styles.leftContainer} onPress={() => console.log('Open drawer or menu')}>
-                <Feather name="menu" size={24} color="#FFFFFF" />
-              </TouchableOpacity>
-        
-              {/* Center: Logo */}
-              <View style={styles.centerContainer}>
-                <Image
-                  source={require('@/assets/images/logoText.png')}
-                  style={styles.logoImage}
-                  resizeMode="contain"
-                />
-              </View>
-        
-              {/* Right: Profile */}
-              <TouchableOpacity style={styles.rightContainer} onPress={() => console.log('Go to profile')}>
-                <Feather name="user" size={24} color="#FFFFFF" />
-              </TouchableOpacity>
-            </View>
-
-
-
       <ScrollView style={styles.contentContainer}>
         <View style={styles.card}>
           <Image source={{ uri: user.image }} style={styles.avatar} />
@@ -63,7 +39,15 @@ export default function CustomerPg3Screen() {
           <Text style={styles.label}>Address:</Text>
           <Text style={styles.value}>{user.address}</Text>
 
-          <TouchableOpacity style={styles.button} onPress={() => router.push({ pathname: '/customerPg4', params: { userId: user.id.toString() } })}>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() =>
+              router.push({
+                pathname: "/customerPg4",
+                params: { userId: user.id.toString() },
+              })
+            }
+          >
             <Text style={styles.buttonText}>Send Hire Request</Text>
           </TouchableOpacity>
         </View>
@@ -75,54 +59,22 @@ export default function CustomerPg3Screen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F0F0',
+    backgroundColor: "#F5F0F0",
   },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 38,
-    backgroundColor: '#1A0D0E',
-    position: 'relative',
-  },
-  leftContainer: {
-    width: 70,
-    paddingTop: 20,
-    alignItems: 'flex-start',
-    justifyContent: 'center',
-  },
-  centerContainer: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    paddingTop: 30,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  rightContainer: {
-    width: 70,
-    paddingTop: 20,
-    alignItems: 'flex-end',
-    justifyContent: 'center',
-  },
-  logoImage: {
-    width: 120,
-    height: 60,
-  },
+
   contentContainer: {
     flex: 1,
-    backgroundColor: '#F5F0F0',
+    backgroundColor: "#F5F0F0",
     paddingHorizontal: 16,
     paddingTop: 16,
     paddingBottom: 80,
   },
   card: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderRadius: 12,
     padding: 20,
     marginBottom: 20,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOpacity: 0.1,
     shadowRadius: 10,
     elevation: 5,
@@ -131,31 +83,31 @@ const styles = StyleSheet.create({
     width: 120,
     height: 120,
     borderRadius: 60,
-    alignSelf: 'center',
+    alignSelf: "center",
     marginBottom: 20,
   },
   name: {
     fontSize: 22,
-    fontWeight: 'bold',
-    color: '#1A0D0E',
-    textAlign: 'center',
+    fontWeight: "bold",
+    color: "#1A0D0E",
+    textAlign: "center",
     marginBottom: 8,
   },
   fee: {
     fontSize: 16,
-    color: '#FF4D4D',
-    textAlign: 'center',
+    color: "#FF4D4D",
+    textAlign: "center",
     marginBottom: 20,
   },
   label: {
     fontSize: 14,
-    fontWeight: 'bold',
-    color: '#333',
+    fontWeight: "bold",
+    color: "#333",
     marginTop: 10,
   },
   value: {
     fontSize: 14,
-    color: '#555',
+    color: "#555",
     marginBottom: 6,
   },
   button: {
@@ -163,12 +115,12 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderWidth: 1,
     borderRadius: 8,
-    backgroundColor: '#FF4D4D',
-    alignItems: 'center',
-    borderColor: '#FF4D4D',
+    backgroundColor: "#FF4D4D",
+    alignItems: "center",
+    borderColor: "#FF4D4D",
   },
   buttonText: {
     fontSize: 16,
-    color: '#FFFFFF',
+    color: "#FFFFFF",
   },
 });
