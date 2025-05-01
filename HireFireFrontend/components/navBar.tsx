@@ -2,21 +2,23 @@ import React from "react";
 import { View, TouchableOpacity, Text, StyleSheet } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import { useAppContext } from "@/scripts/AppContext";
 
 const NavBar = () => {
   const router = useRouter();
+  const {user, setUser} = useAppContext();
 
   return (
     //sample routes until we make the required screens
     <View style={styles.navBar}>
-      <TouchableOpacity onPress={() => router.push("/customerPg")}>
+      <TouchableOpacity onPress={() => user?.role == 'client' ? router.push("/customerPg") : router.push('/workerPg')}>
         <View style={styles.iconWrapper}>
           <Feather name="home" size={24} color="#1A0D0E" />
         </View>
         {/* <Text style={styles.label}>Home</Text> */}
       </TouchableOpacity>
 
-      <TouchableOpacity onPress={() => router.push("/ReviewPg")}>
+      <TouchableOpacity onPress={() => router.push("/chats")}>
         <View style={styles.iconWrapper}>
           <Feather name="message-circle" size={24} color="#1A0D0E" />
         </View>

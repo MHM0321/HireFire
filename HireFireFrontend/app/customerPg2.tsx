@@ -13,6 +13,7 @@ import usersData from '@/assets/data/exampleUsers.json';
 import { Feather, FontAwesome } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { ThemedText } from '@/components/ThemedText';
+import { useAppContext } from '@/scripts/AppContext';
 
 // Define TypeScript interface for user data
 interface User {
@@ -37,6 +38,7 @@ export default function CustomerPg2CScreen() {
     const bonus = Math.min(20, Math.floor(reviews / 50)); // Bonus based on review count, max 20%
     return base + bonus;
   };
+  const {user, setUser} = useAppContext();
 
   const renderStars = (rating: number) => {
     const stars = [];
@@ -54,6 +56,21 @@ export default function CustomerPg2CScreen() {
     }
     return <View style={styles.starRow}>{stars}</View>;
   };
+
+  const handleChatButtonPress = (workerName: any, workerId: any) => {
+    const params = {
+      clientName: user?.name,
+      clientId: user?.userId,
+      workerName,
+      workerId,
+      role: 'client'
+    };
+
+    router.push({
+      pathname: "/chatPg",
+      params,
+    });
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -93,7 +110,7 @@ export default function CustomerPg2CScreen() {
 
                 {/* Action buttons */}
                 <View style={styles.actionRow}>
-                  <TouchableOpacity style={styles.chatButton}>
+                  <TouchableOpacity style={styles.chatButton} onPress={() => handleChatButtonPress(user.name, user.id)}>
                     <FontAwesome name="comment-o" size={20} color="#333" />
                   </TouchableOpacity>
                   <TouchableOpacity 

@@ -3,6 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Switch, Ima
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons'; // Import Ionicons from Expo
 import { BASE_URL } from '@/config';
+import { useAppContext } from '@/scripts/AppContext';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -12,6 +13,8 @@ const Login = () => {
   const [successMessage, setSuccessMessage] = useState('');
   const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
   const router = useRouter();
+  
+  const { user, setUser } = useAppContext();
 
   const handleLogin = async () => {
     // Reset messages
@@ -52,16 +55,18 @@ const Login = () => {
       }
   
       setSuccessMessage('Logged in successfully!');
+      console.log(data);
+      setUser({
+        name: data.name,
+        email: data.email,
+        userId: data.userId,
+        role: (isWorker) ? 'worker' : 'client'
+      })
       
       // Navigate to appropriate page based on account type
-      const destination = isWorker ? '/workerDashboard' : '/customerPg';
+      const destination: any = isWorker ? '/workerPg' : '/customerPg';
       
-      Alert.alert('Success', 'Logged in successfully!', [
-        {
-          text: 'OK',
-          onPress: () => router.replace(destination as any),
-        },
-      ]);
+      router.replace(destination);
   
       // Clear form after successful login
       setEmail('');

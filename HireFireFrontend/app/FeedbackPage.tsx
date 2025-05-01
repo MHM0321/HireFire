@@ -14,13 +14,13 @@ import {
 } from "react-native";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import { useRouter } from "expo-router";
-const router = useRouter();
 
 const FeedbackScreen = () => {
   const [feedback, setFeedback] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [rating, setRating] = useState<number>(0);
   const [hoverRating, setHoverRating] = useState<number>(0);
+  const router = useRouter();
 
   const handleSubmit = () => {
     console.log("Feedback submitted:", feedback);

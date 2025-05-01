@@ -24,10 +24,10 @@ export default function MyClientsScreen() {
     router.back();
   };
 
-  const handleMessagePress = (clientName: string) => {
+  const handleMessagePress = (clientName: string, clientId: string) => {
     router.push({
       pathname: "/chatPg",
-      params: { clientName },
+      params: { clientName, clientId, workerName, workerId, role: 'worker' },
     });
   };
 
@@ -40,7 +40,7 @@ export default function MyClientsScreen() {
         {clients.map((client) => (
           <View key={client.id} style={styles.clientCard}>
             <Text style={styles.clientName}>{client.name}</Text>
-            <TouchableOpacity onPress={() => handleMessagePress(client.name)}>
+            <TouchableOpacity onPress={() => handleMessagePress(client.name, client.id)}>
               <Feather name="message-square" size={24} color="#F44336" />
             </TouchableOpacity>
           </View>

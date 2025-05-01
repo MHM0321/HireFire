@@ -14,17 +14,19 @@ import { ThemedView } from "@/components/ThemedView";
 import { DateTimePicker } from "@/components/DateTimePicker";
 import { Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import { useAppContext } from "@/scripts/AppContext";
 
 export default function WorkerScreen() {
   const [location, setLocation] = useState("");
   const router = useRouter();
+  const {user, setUser} = useAppContext();
 
   return (
     <ThemedView style={styles.container}>
       {/* Main Content */}
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.welcomeSection}>
-          <Text style={styles.welcomeText}>Welcome, Worker</Text>
+          <Text style={styles.welcomeText}>Welcome, {user?.name || "null (user not logged in)"}</Text>
         </View>
 
         {/* Search */}

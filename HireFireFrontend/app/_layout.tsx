@@ -13,6 +13,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Tabs } from "expo-router";
 import { Feather } from "@expo/vector-icons";
 import React from "react";
+import { AppProvider } from "@/scripts/AppContext";
 const Tab = createBottomTabNavigator();
 
 const CustomDarkTheme = {
@@ -43,12 +44,14 @@ export default function Layout() {
   const colorScheme = "dark";
 
   return (
+    <AppProvider>
       <ThemeProvider
         value={colorScheme === "dark" ? CustomDarkTheme : CustomLightTheme}
       >
         <SidebarLayout>
           <Slot />
         </SidebarLayout>
-      </ThemeProvider>
-      );
+      </ThemeProvider>      
+    </AppProvider>
+  );
 }

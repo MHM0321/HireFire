@@ -1,8 +1,11 @@
 //potato
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, TextInput, ScrollView } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
+import firebaseDb from '@/firebase'
+import { collection, addDoc, serverTimestamp, query, orderBy, onSnapshot, getDocs, doc, setDoc } from "firebase/firestore";
+import { useAppContext } from '@/scripts/AppContext';
 
 type Message = {
   id: string;
@@ -12,29 +15,138 @@ type Message = {
 
 export default function ChatScreen() {
   const router = useRouter();
-  const { clientName } = useLocalSearchParams<{ clientName: string }>();
+  const {
+    clientName,
+    clientId,
+    workerName,
+    workerId,
+    role
+  } = useLocalSearchParams<{
+    clientName: string,
+    clientId: string,
+    workerName: string,
+    workerId: string,
+    role: 'client' | 'worker'
+  }>();
   
   const [messages, setMessages] = useState<Message[]>([
-    { id: '1', text: 'Hello, how can I help you?', sender: 'client' },
-    { id: '2', text: 'I need help with plumbing at my house.', sender: 'worker' },
+    // { id: '1', text: 'Hello, how can I help you?', sender: 'client' },
+    // { id: '2', text: 'I need help with plumbing at my house.', sender: 'worker' },
   ]);
 
   const [newMessage, setNewMessage] = useState('');
+  const [messagesLoading, setMessagesLoading] = useState(true);
 
-  const handleSendMessage = () => {
-    if (newMessage.trim()) {
-      setMessages([
-        ...messages,
-        { 
-          id: String(messages.length + 1), 
-          text: newMessage, 
-          sender: 'worker' 
-        },
-      ]);
-      setNewMessage('');
+
+  const addMessage = (message: Message) => {
+    setMessages([
+      ...messages,
+      message,
+    ]);
+  }
+  
+  const handleSendMessage = async () => {
+    const chatId = `chat-${workerId}`;
+
+    try {
+      if (newMessage.trim()) {
+        setNewMessage('');
+        await addDoc(collection(firebaseDb, chatId), {
+          role,
+          author: role === 'client' ? clientName : workerName,
+          userId: role === 'client' ? clientId : workerId,
+          message: newMessage,
+          createdAt: serverTimestamp(),
+        });
+        await setDoc(doc(firebaseDb, "chats", chatId), {
+          workerId,
+          clientId,
+          workerName,
+          clientName,
+          lastMessage: newMessage,
+          updatedAt: serverTimestamp(),
+        }, { merge: true }); // Merge ensures existing fields are not lost
+  
+        // addMessage({ 
+        //   id: String(messages.length + 1), 
+        //   text: newMessage, 
+        //   sender: role
+        // });
+      }
+    } catch (error: any) {
+      console.log(error);
     }
   };
 
+  useEffect(() => {
+    if (!clientId || !workerId) return;
+  
+    const chatId = `chat-${workerId}`;
+    const chatRef = collection(firebaseDb, chatId);
+    const q = query(chatRef, orderBy('createdAt', 'asc'));
+  
+    const setupChat = async () => {
+      // Initial one-time fetch
+      try {
+        const snapshot = await getDocs(q);
+        const initialMessages: Message[] = [];
+  
+        snapshot.forEach((doc) => {
+          const data = doc.data();
+          const senderId = data.userId;
+  
+          if (senderId === clientId || senderId === workerId) {
+            initialMessages.push({
+              id: doc.id,
+              text: data.message,
+              sender: data.role,
+            });
+          }
+        });
+  
+        setMessages(initialMessages);
+        setMessagesLoading(false);
+      } catch (error) {
+        console.error('Error fetching initial messages:', error);
+      }
+  
+      // Then listen for new messages
+      const unsubscribe = onSnapshot(q, (snapshot) => {
+        snapshot.docChanges().forEach((change) => {
+          const data = change.doc.data();
+          const senderId = data.userId;
+  
+          if (change.type === 'added' && (senderId === clientId || senderId === workerId)) {
+            const newMsg: Message = {
+              id: change.doc.id,
+              text: data.message,
+              sender: data.role,
+            };
+  
+            setMessages((prev) => {
+              const exists = prev.some((msg) => msg.id === newMsg.id);
+              return exists ? prev : [...prev, newMsg];
+            });
+          }
+        });
+      });
+  
+      return unsubscribe;
+    };
+  
+    let unsubscribeListener: (() => void) | undefined;
+  
+    setupChat().then((unsubscribe) => {
+      unsubscribeListener = unsubscribe;
+    });
+  
+    return () => {
+      if (unsubscribeListener) {
+        unsubscribeListener();
+      }
+    };
+  }, [clientId, workerId]);
+  
   return (
     <View style={styles.container}>
       {/* Header */}
@@ -42,7 +154,7 @@ export default function ChatScreen() {
         <TouchableOpacity onPress={() => router.back()}>
           <Feather name="arrow-left" size={24} color="#FFFFFF" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>{clientName}</Text>
+        <Text style={styles.headerTitle}>{role === 'worker' ? clientName : workerName} - {role === 'worker' ? clientId : workerId}</Text>
       </View>
 
       {/* Chat Messages */}
@@ -50,17 +162,18 @@ export default function ChatScreen() {
         style={styles.chatContainer}
         contentContainerStyle={styles.chatContentContainer}
       >
+        {messagesLoading && <Text>Loading...</Text>}
         {messages.map((message) => (
           <View
             key={message.id}
             style={[
               styles.messageBubble,
-              message.sender === 'worker' ? styles.workerMessage : styles.clientMessage,
+              message.sender === role ? styles.outgoingMessage : styles.incomingMessage,
             ]}
           >
             <Text style={[
               styles.messageText,
-              message.sender === 'worker' ? styles.workerText : styles.clientText
+              message.sender === role ? styles.outgoingText : styles.incomingText
             ]}>
               {message.text}
             </Text>
@@ -120,21 +233,21 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 10,
   },
-  workerMessage: {
+  outgoingMessage: {
     alignSelf: 'flex-end',
     backgroundColor: '#FF4D4D', // Changed to red (#FF4D4D)
   },
-  clientMessage: {
+  incomingMessage: {
     alignSelf: 'flex-start',
     backgroundColor: '#E0E0E0',
   },
   messageText: {
     fontSize: 16,
   },
-  workerText: {
+  outgoingText: {
     color: '#FFFFFF',
   },
-  clientText: {
+  incomingText: {
     color: '#333333',
   },
   inputContainer: {
