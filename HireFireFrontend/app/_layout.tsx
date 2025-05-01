@@ -41,6 +41,7 @@ export default function Layout() {
       <Stack>
         <Stack.Screen name="index" options={{ headerShown: false }} />
         <Stack.Screen name="customerPg" options={{ headerShown: false }} />
+        <Stack.Screen name="customerPgC" options={{ headerShown: false }} />
         <Stack.Screen name="redButton" options={{ headerShown: false }} />
         <Stack.Screen
           name="customerPg2"
@@ -54,7 +55,20 @@ export default function Layout() {
             headerTitle: "",
           }}
         />
+          <Stack.Screen
+          name="customerPg2C"
+          options={{
+            headerTitle: "",
+          }}
+        />
+        <Stack.Screen
+          name="customerPg3C"
+          options={{
+            headerTitle: "",
+          }}
+        />
         <Stack.Screen name="customerPg4" options={{ headerShown: false }} />
+        <Stack.Screen name="customerPg4C" options={{ headerShown: false }} />
         <Stack.Screen name="appointmentsPg" options={{ headerShown: false }} />
         <Stack.Screen name="chatPg" options={{ headerShown: false }} />
         <Stack.Screen name="earningsPg" options={{ headerShown: false }} />

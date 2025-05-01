@@ -9,7 +9,7 @@ import {
   ScrollView,
   TextInput,
 } from 'react-native';
-import usersData from '@/assets/data/exampleUsers.json';
+import usersData from '@/assets/data/exampleConsultants.json';
 import { Feather, FontAwesome } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { ThemedText } from '@/components/ThemedText';
@@ -28,7 +28,7 @@ interface User {
   // You can add any additional fields that might be present in your JSON
 }
 
-export default function CustomerPg2Screen() {
+export default function CustomerPg2CScreen() {
   // Calculate satisfaction percentage from reviews count (just for demo purposes)
   const calculateSatisfaction = (reviews: number): number => {
     // Simple algorithm to create a satisfaction percentage from reviews
@@ -119,7 +119,7 @@ export default function CustomerPg2Screen() {
                   </TouchableOpacity>
                   <TouchableOpacity 
                     style={styles.bookButton}
-                    onPress={() => router.push({ pathname: '/customerPg3', params: { userId: user.id } })}
+                    onPress={() => router.push({ pathname: '/customerPg3C', params: { userId: user.id } })}
                   >
                     <Text style={styles.bookButtonText}>Hire Details</Text>
                     <Feather name="arrow-right" size={18} color="#FFF" />
