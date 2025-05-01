@@ -3,12 +3,9 @@ package com.HireFire.HireFireBackend;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-//main entry point
 @SpringBootApplication
-public class HireFireBackendApplication
-{
-	public static void main(String[] args)
-	{
+public class HireFireBackendApplication {
+	public static void main(String[] args) {
 		SpringApplication.run(HireFireBackendApplication.class, args);
 		//here, we will connect to our front end, then after sign in we will determine the account
 		//lets say it is customer, we will then make a customer object here, retrieve data from
