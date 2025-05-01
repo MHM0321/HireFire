@@ -42,10 +42,6 @@ export default function Layout() {
   const colorScheme = "dark";
 
   return (
-    <ThemeProvider
-      value={colorScheme === "dark" ? CustomDarkTheme : CustomLightTheme}
-    >
-      return (
       <ThemeProvider
         value={colorScheme === "dark" ? CustomDarkTheme : CustomLightTheme}
       >
@@ -54,6 +50,4 @@ export default function Layout() {
         </SidebarLayout>
       </ThemeProvider>
       );
-    </ThemeProvider>
-  );
 }

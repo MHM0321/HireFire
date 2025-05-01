@@ -57,28 +57,6 @@ export default function CustomerPg2CScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        {/* Left: Hamburger */}
-        <TouchableOpacity style={styles.leftContainer} onPress={() => console.log('Open drawer or menu')}>
-          <Feather name="menu" size={24} color="#FFFFFF" />
-        </TouchableOpacity>
-  
-        {/* Center: Logo */}
-        <View style={styles.centerContainer}>
-          <Image
-            source={require('@/assets/images/logoText.png')}
-            style={styles.logoImage}
-            resizeMode="contain"
-          />
-        </View>
-  
-        {/* Right: Profile */}
-        <TouchableOpacity style={styles.rightContainer} onPress={() => console.log('Go to profile')}>
-          <Feather name="user" size={24} color="#FFFFFF" />
-        </TouchableOpacity>
-      </View>
-
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         {/* Section Title */}
         <View style={styles.sectionTitleContainer}>

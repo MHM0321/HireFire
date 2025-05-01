@@ -67,6 +67,19 @@ export default function CustomerPgScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+
+          {/* Search Bar */}
+          <View style={styles.searchContainer}>
+        <View style={styles.searchBar}>
+          <Feather name="search" size={20} color="#666666" style={styles.searchIcon} />
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Set Location"
+            placeholderTextColor="#666666"
+          />
+        </View>
+      </View>
+
       <ScrollView style={styles.contentContainer}>
         {/* DateTime */}
         <ThemedText style={styles.DTLabel}>Select Date and Time</ThemedText>
