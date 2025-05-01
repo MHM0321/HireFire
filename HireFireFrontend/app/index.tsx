@@ -2,6 +2,7 @@ import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 
 import { Redirect } from "expo-router";
+import React from "react";
 
 export default function Index() {
   return <Redirect href="/customerPgC" />; //un-comment to make it work

@@ -12,6 +12,7 @@ import SidebarLayout from "../components/sidebarWrapper";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Tabs } from "expo-router";
 import { Feather } from "@expo/vector-icons";
+import React from "react";
 const Tab = createBottomTabNavigator();
 
 const CustomDarkTheme = {

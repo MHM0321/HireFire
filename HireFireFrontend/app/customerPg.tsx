@@ -15,6 +15,8 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { FontAwesome6 } from "@expo/vector-icons";
 import { Image } from "react-native";
 import { DateTimePicker } from "@/components/DateTimePicker";
+import { LocationSearch } from '@/components/LocationSearch';
+import { LocationMapModal } from '@/components/LocationMapModal';
 
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
@@ -43,10 +45,13 @@ export default function CustomerPgScreen() {
   const [selectedDate, setSelectedDate] = useState(initialDate);
   // Add state for selected category
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
+  const [selectedLocation, setSelectedLocation] = useState<any>(null);
+  const [showMapModal, setShowMapModal] = useState(false);
 
   // Function to handle category selection
   const handleCategorySelect = (index: number) => {
     setSelectedCategory(index);
+    
   };
 
   // Function to navigate to the next page
@@ -55,6 +60,9 @@ export default function CustomerPgScreen() {
     console.log("Navigating to next page with:", {
       category: selectedCategoryData,
       date: selectedDate,
+      location: selectedLocation.display_name,
+      lat: selectedLocation.lat,
+      lon: selectedLocation.lon
     });
 
     // Navigate to the next page with params (replace with your actual route)
@@ -68,17 +76,24 @@ export default function CustomerPgScreen() {
   return (
     <SafeAreaView style={styles.container}>
 
-          {/* Search Bar */}
-          <View style={styles.searchContainer}>
-        <View style={styles.searchBar}>
-          <Feather name="search" size={20} color="#666666" style={styles.searchIcon} />
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Set Location"
-            placeholderTextColor="#666666"
-          />
-        </View>
-      </View>
+         {/* Location Search */}
+         <LocationSearch
+          onLocationSelect={(location) => {
+            setSelectedLocation(location);
+            setShowMapModal(true);
+          }}
+        />
+
+        {/* Selected Location Preview */}
+        {selectedLocation && (
+          <TouchableOpacity
+            style={styles.selectedLocation}
+            onPress={() => setShowMapModal(true)}
+          >
+            <ThemedText>{selectedLocation.display_name}</ThemedText>
+            <Feather name="map-pin" size={16} color="#FF4D4D" />
+          </TouchableOpacity>
+        )}
 
       <ScrollView style={styles.contentContainer}>
         {/* DateTime */}
@@ -146,17 +161,20 @@ export default function CustomerPgScreen() {
         </View>
       </ScrollView>
 
-      {/* Next Button - Only shown when a category is selected */}
-      {selectedCategory !== null && (
+
+      {/* Map Modal */}
+      <LocationMapModal
+        visible={showMapModal}
+        location={selectedLocation}
+        onClose={() => setShowMapModal(false)}
+      />
+
+      {/* Next Button */}
+      {selectedCategory !== null && selectedLocation && (
         <View style={styles.nextButtonContainer}>
           <TouchableOpacity style={styles.nextButton} onPress={handleNextPress}>
             <ThemedText style={styles.nextButtonText}>Next</ThemedText>
-            <Feather
-              name="arrow-right"
-              size={20}
-              color="#FFFFFF"
-              style={styles.nextButtonIcon}
-            />
+            <Feather name="arrow-right" size={20} color="#FFF" />
           </TouchableOpacity>
         </View>
       )}
@@ -287,5 +305,16 @@ const styles = StyleSheet.create({
   },
   nextButtonIcon: {
     marginLeft: 8,
+  },
+  selectedLocation: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: '#FFF',
+    padding: 16,
+    borderRadius: 8,
+    marginHorizontal: 16,
+    marginBottom: 16,
+    elevation: 2,
   },
 });
