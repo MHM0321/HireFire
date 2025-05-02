@@ -64,7 +64,7 @@ const Login = () => {
       })
       
       // Navigate to appropriate page based on account type
-      const destination: any = isWorker ? '/workerPg' : '/customerPg';
+      const destination: any = isWorker ? '/homePageWorker' : '/homePageCustomer';
       
       router.replace(destination);
   

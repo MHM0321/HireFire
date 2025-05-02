@@ -11,7 +11,7 @@ const NavBar = () => {
   return (
     //sample routes until we make the required screens
     <View style={styles.navBar}>
-      <TouchableOpacity onPress={() => user?.role == 'client' ? router.push("/customerPg") : router.push('/workerPg')}>
+      <TouchableOpacity onPress={() => user?.role == 'client' ? router.push("/homePageCustomer") : router.push('/homePageWorker')}>
         <View style={styles.iconWrapper}>
           <Feather name="home" size={24} color="#1A0D0E" />
         </View>
