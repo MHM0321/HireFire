@@ -1,4 +1,3 @@
-//potato
 import { useState } from "react";
 import {
   View,
@@ -6,9 +5,8 @@ import {
   TouchableOpacity,
   StyleSheet,
   ScrollView,
-  Image,
 } from "react-native";
-import { Feather } from "@expo/vector-icons";
+import { Feather, FontAwesome } from "@expo/vector-icons";
 import { ThemedView } from "@/components/ThemedView";
 import { useRouter } from "expo-router/build/exports";
 import React from "react";
@@ -32,6 +30,10 @@ export default function MyClientsScreen() {
     });
   };
 
+  const handlePaymentPress = () => {
+    router.push("/payment"); // Add your payment page route here
+  };
+
   return (
     <ThemedView style={styles.container}>
       {/* Main Content */}
@@ -40,6 +42,9 @@ export default function MyClientsScreen() {
 
         {clients.map((client) => (
           <View key={client.id} style={styles.clientCard}>
+            <TouchableOpacity onPress={handlePaymentPress}>
+              <FontAwesome name="money" size={24} color="#FF4D4D" />
+            </TouchableOpacity>
             <Text style={styles.clientName}>{client.name}</Text>
             <TouchableOpacity onPress={() => handleMessagePress(client.name, client.id)}>
               <Feather name="message-square" size={24} color="#F44336" />
@@ -56,7 +61,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#1D1D1D",
   },
-
   content: {
     flexGrow: 1,
     backgroundColor: "#F5F0F0",
