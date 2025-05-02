@@ -11,7 +11,7 @@ import { Feather } from "@expo/vector-icons";
 import { ThemedText } from "@/components/ThemedText";
 import LottieView from "lottie-react-native";
 import { Audio } from "expo-av";
-import { router, useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router/build/exports";
 import { Text } from "react-native";
 
 import exampleUsers from "@/assets/data/exampleUsers.json"; // Adjust path if needed
@@ -53,7 +53,7 @@ export default function CustomerPgScreen() {
 
           <TouchableOpacity
             style={styles.button}
-            onPress={() => router.push({ pathname: "/customerPg", params: {} })}
+            onPress={() => router.push({ pathname: "/homePageCustomer", params: {} })}
           >
             <Text style={styles.buttonText}>Home</Text>
           </TouchableOpacity>

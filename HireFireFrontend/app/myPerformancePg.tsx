@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { FontAwesome5, MaterialIcons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
+import { useRouter } from "expo-router/build/exports";
 import { PieChart } from "react-native-chart-kit";
 import { Dimensions } from "react-native";
 import React from "react";

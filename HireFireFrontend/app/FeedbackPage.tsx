@@ -13,7 +13,8 @@ import {
   Keyboard,
 } from "react-native";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
-import { useRouter } from "expo-router";
+import { useRouter } from "expo-router/build/exports";
+const router = useRouter();
 
 const FeedbackScreen = () => {
   const [feedback, setFeedback] = useState("");

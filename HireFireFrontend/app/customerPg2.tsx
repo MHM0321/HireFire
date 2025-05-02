@@ -11,7 +11,8 @@ import {
 } from 'react-native';
 import usersData from '@/assets/data/exampleUsers.json';
 import { Feather, FontAwesome } from '@expo/vector-icons';
-import { router, useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams } from 'expo-router';
+import { router } from 'expo-router/build/exports';
 import { ThemedText } from '@/components/ThemedText';
 import { useAppContext } from '@/scripts/AppContext';
 

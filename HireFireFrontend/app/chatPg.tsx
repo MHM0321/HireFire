@@ -2,10 +2,11 @@
 import { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, TextInput, ScrollView } from 'react-native';
 import { Feather } from '@expo/vector-icons';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router/build/exports';
 import firebaseDb from '@/firebase'
 import { collection, addDoc, serverTimestamp, query, orderBy, onSnapshot, getDocs, doc, setDoc } from "firebase/firestore";
 import { useAppContext } from '@/scripts/AppContext';
+import React from 'react';
 
 type Message = {
   id: string;
@@ -91,7 +92,7 @@ export default function ChatScreen() {
         const snapshot = await getDocs(q);
         const initialMessages: Message[] = [];
   
-        snapshot.forEach((doc) => {
+        snapshot.forEach((doc: { data: () => any; id: any; }) => {
           const data = doc.data();
           const senderId = data.userId;
   
@@ -111,7 +112,7 @@ export default function ChatScreen() {
       }
   
       // Then listen for new messages
-      const unsubscribe = onSnapshot(q, (snapshot) => {
+      const unsubscribe = onSnapshot(q, (snapshot: { docChanges: () => any[]; }) => {
         snapshot.docChanges().forEach((change) => {
           const data = change.doc.data();
           const senderId = data.userId;

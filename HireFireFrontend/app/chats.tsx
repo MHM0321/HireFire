@@ -14,6 +14,7 @@ import { useRouter } from "expo-router";
 import { useAppContext } from "@/scripts/AppContext";
 import { collection, getDocs, query, orderBy } from "firebase/firestore";
 import firebaseDb from "@/firebase";
+import React from "react";
 
 export default function MyClientsScreen() {
   const router = useRouter();

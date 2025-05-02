@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import usersData from '@/assets/data/exampleConsultants.json';
 import { Feather } from '@expo/vector-icons';
-import { useRouter, useLocalSearchParams } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router/build/exports';
 
 export default function CustomerPg3CScreen() {
   const router = useRouter();

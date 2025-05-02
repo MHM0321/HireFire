@@ -1,5 +1,4 @@
 // layout.tsx
-import { Stack } from "expo-router";
 import {
   DarkTheme,
   DefaultTheme,
@@ -7,10 +6,9 @@ import {
 } from "@react-navigation/native";
 import { useColorScheme } from "react-native";
 
-import { Slot } from "expo-router";
+import { Slot } from "expo-router/build/exports";
 import SidebarLayout from "../components/sidebarWrapper";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { Tabs } from "expo-router";
 import { Feather } from "@expo/vector-icons";
 import React from "react";
 import { AppProvider } from "@/scripts/AppContext";

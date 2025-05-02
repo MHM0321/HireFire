@@ -10,7 +10,6 @@ import {
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { ThemedView } from "@/components/ThemedView";
-import { useAppContext } from "@/scripts/AppContext";
 import { useRouter } from "expo-router/build/exports";
 import React from "react";
 
@@ -22,8 +21,6 @@ export default function MyClientsScreen() {
     { id: "3", name: "Sophia Williams" },
   ]);
 
-  const {user, setUser} = useAppContext();
-
   const handleBackPress = () => {
     router.back();
   };
@@ -31,7 +28,7 @@ export default function MyClientsScreen() {
   const handleMessagePress = (clientName: string, clientId: string) => {
     router.push({
       pathname: "/chatPg",
-      params: { clientName, clientId, workerName: user?.name, workerId: user?.userId, role: 'worker' },
+      params: { clientName, clientId, workerName, workerId, role: 'worker' },
     });
   };
 
@@ -39,7 +36,7 @@ export default function MyClientsScreen() {
     <ThemedView style={styles.container}>
       {/* Main Content */}
       <ScrollView contentContainerStyle={styles.content}>
-        <Text style={styles.sectionTitle}>My Clients</Text>
+        <Text style={styles.sectionTitle}>Pending requests</Text>
 
         {clients.map((client) => (
           <View key={client.id} style={styles.clientCard}>
