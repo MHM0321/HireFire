@@ -8,8 +8,9 @@ import {
   Linking,
 } from "react-native";
 import axios from "axios";
+import { BASE_URL } from "@/config";
 
-const API_BASE_URL = "http://192.168.10.17:8080/api";
+// const API_BASE_URL = "http://192.168.10.17:8080/api";
 
 export default function PaymentScreen() {
   const [isLoading, setIsLoading] = useState(false);
@@ -24,7 +25,7 @@ export default function PaymentScreen() {
 
     try {
       // 1. Call backend to get JazzCash URL
-      const response = await axios.get(`${API_BASE_URL}/payments/initiate`);
+      const response = await axios.get(`${BASE_URL}api/payments/initiate`);
       const jazzCashUrl = response.data.redirectUrl;
       console.log(jazzCashUrl);
 

@@ -3,6 +3,7 @@ import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { Ionicons, Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import { useAppContext } from "@/scripts/AppContext";
 
 interface SidebarProps {
   closeSidebar: () => void;
@@ -17,6 +18,7 @@ const Sidebar: React.FC<SidebarProps> = ({ closeSidebar, userName }) => {
     { label: "Logout", action: "logout" },
   ];
   const router = useRouter();
+  const {user, setUser} = useAppContext();
 
   const handlePress = (route?: string, action?: string) => {
     closeSidebar();
@@ -33,6 +35,9 @@ const Sidebar: React.FC<SidebarProps> = ({ closeSidebar, userName }) => {
     if (action === "logout") {
       //  logout logic
       console.log("User logged out");
+      setUser(null);
+      router.navigate("/login")
+      
     } else if (route) {
       router.push(route as any);
     }

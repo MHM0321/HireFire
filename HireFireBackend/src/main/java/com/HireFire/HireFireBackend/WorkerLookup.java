@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.HireFire.HireFireBackend.WorkerLookup.WorkerLookupRequest.Location;
+import com.HireFire.HireFireBackend.WorkerLookup.Location;
 
 @RestController
 @RequestMapping("/api/worker")
@@ -60,79 +60,78 @@ public class WorkerLookup {
         public void setCategory(String category) {
             this.category = category;
         }
-    
-        // Inner Location class
-        public static class Location {
-            private Double lat;
-            private Double lon;
-    
-            public Location() {
-                
-            }
+    }
+
+    public static class Location {
+        private Double lat;
+        private Double lon;
+
+        public Location() {
             
-            public Location(String locationString) {
-                if (locationString == null || !locationString.contains(",")) {
-                    throw new IllegalArgumentException("Invalid location format: " + locationString);
-                }
+        }
         
-                String[] parts = locationString.split(",");
-                if (parts.length != 2) {
-                    throw new IllegalArgumentException("Location string must have exactly two values separated by a comma");
-                }
+        public Location(String locationString) {
+            if (locationString == null || !locationString.contains(",")) {
+                throw new IllegalArgumentException("Invalid location format: " + locationString);
+            }
+    
+            String[] parts = locationString.split(",");
+            if (parts.length != 2) {
+                throw new IllegalArgumentException("Location string must have exactly two values separated by a comma");
+            }
+    
+            try {
+                this.lat = Double.parseDouble(parts[0].trim());
+                this.lon = Double.parseDouble(parts[1].trim());
+            } catch (NumberFormatException e) {
+                throw new IllegalArgumentException("Latitude and longitude must be valid numbers", e);
+            }
+        }
         
-                try {
-                    this.lat = Double.parseDouble(parts[0].trim());
-                    this.lon = Double.parseDouble(parts[1].trim());
-                } catch (NumberFormatException e) {
-                    throw new IllegalArgumentException("Latitude and longitude must be valid numbers", e);
-                }
-            }
-            
-            // Getters and setters
-            public Double getLat() {
-                return lat;
-            }
-    
-            public void setLat(Double lat) {
-                this.lat = lat;
-            }
-    
-            public Double getLon() {
-                return lon;
-            }
-    
-            public void setLon(Double lon) {
-                this.lon = lon;
-            }
+        // Getters and setters
+        public Double getLat() {
+            return lat;
+        }
 
-            // Calculate if this location is within 5km of another location
-            public boolean inRange(Location other) {
-                // Convert to double degrees assuming original integers are in degrees (e.g., 37.7749 -> 37774900)
-                double thisLat = this.lat;
-                double thisLon = this.lon;
-                double otherLat = other.lat;
-                double otherLon = other.lon;
+        public void setLat(Double lat) {
+            this.lat = lat;
+        }
 
-                double earthRadiusKm = 6371.0;
+        public Double getLon() {
+            return lon;
+        }
 
-                double dLat = Math.toRadians(otherLat - thisLat);
-                double dLon = Math.toRadians(otherLon - thisLon);
+        public void setLon(Double lon) {
+            this.lon = lon;
+        }
 
-                double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-                        Math.cos(Math.toRadians(thisLat)) * Math.cos(Math.toRadians(otherLat)) *
-                        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        // Calculate if this location is within 5km of another location
+        public boolean inRange(Location other) {
+            // Convert to double degrees assuming original integers are in degrees (e.g., 37.7749 -> 37774900)
+            double thisLat = this.lat;
+            double thisLon = this.lon;
+            double otherLat = other.lat;
+            double otherLon = other.lon;
 
-                double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            double earthRadiusKm = 6371.0;
 
-                double distanceKm = earthRadiusKm * c;
+            double dLat = Math.toRadians(otherLat - thisLat);
+            double dLon = Math.toRadians(otherLon - thisLon);
 
-                return distanceKm <= 5.0;
-            }
+            double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                    Math.cos(Math.toRadians(thisLat)) * Math.cos(Math.toRadians(otherLat)) *
+                    Math.sin(dLon / 2) * Math.sin(dLon / 2);
 
-            @Override
-            public String toString() {
-                return lat + "," + lon;
-            }
+            double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+            double distanceKm = earthRadiusKm * c;
+
+            return distanceKm <= 5.0;
+        }
+
+        @Override
+        public String toString() {
+            return lat + "," + lon;
         }
     }
 

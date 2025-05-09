@@ -8,12 +8,14 @@ import {
 import Sidebar from "./sidebar";
 import Header from "./header";
 import NavBar from "./navBar";
+import { useAppContext } from "@/scripts/AppContext";
 
 const SidebarLayout: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [sidebarVisible, setSidebarVisible] = useState(false);
   const slideAnim = useRef(new Animated.Value(-280)).current;
+  const {user, setUser} = useAppContext();
 
   const openSidebar = () => {
     setSidebarVisible(true);
@@ -34,9 +36,9 @@ const SidebarLayout: React.FC<{ children: React.ReactNode }> = ({
 
   return (
     <View style={{ flex: 1 }}>
-      <Header onMenuPress={openSidebar} />
+      {user != null && <Header onMenuPress={openSidebar} />}
       <View style={{ flex: 1 }}>{children}</View>
-      <NavBar />
+      {user != null && <NavBar />}
       {sidebarVisible && (
         <TouchableWithoutFeedback onPress={closeSidebar}>
           <View style={StyleSheet.absoluteFill}>

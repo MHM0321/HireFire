@@ -1,15 +1,47 @@
 import React, { useState } from "react";
-import { StyleSheet, View, TouchableOpacity, SafeAreaView, ScrollView } from "react-native";
+import { StyleSheet, View, TouchableOpacity, SafeAreaView, ScrollView, Alert } from "react-native";
 import { useRouter } from "expo-router/build/exports";
 import { ThemedText } from "@/components/ThemedText";
 import { LocationSearch } from "@/components/LocationSearch";
 import { LocationMapModal } from "@/components/LocationMapModal";
 import { MaterialIcons } from "@expo/vector-icons";
+import { BASE_URL } from "@/config";
+import { useAppContext } from "@/scripts/AppContext";
 
 export default function WorkerPreferredLocationPgScreen() {
   const [selectedLocation, setSelectedLocation] = useState<any>(null);
   const [showMapModal, setShowMapModal] = useState(false);
+  const {user, setUser} = useAppContext();
 
+  const savePreferredLocation = async () => {
+    try {
+      const reqBody = {
+        lat: parseFloat(selectedLocation.lat),
+        lon: parseFloat(selectedLocation.lon)
+      };
+
+      const response = await fetch(BASE_URL + `api/workers/${user?.userId}/update_preferred_location`, {
+        headers: {
+          'Content-type': 'application/json'
+        },
+        method: "POST",
+        body: JSON.stringify(reqBody)
+      });
+
+      if (!response.ok)
+        throw "An error occured: HTTP " + response.status;
+      
+      const resJson = await response.json();
+      
+      if (!resJson.success)
+        throw resJson.message
+      
+      Alert.alert("Success!", resJson.message);
+    } catch (e) {
+      console.log(e);
+    }
+  }
+  
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -41,7 +73,7 @@ export default function WorkerPreferredLocationPgScreen() {
 
         {/* Save Button */}
         {selectedLocation && (
-          <TouchableOpacity style={styles.saveButton}>
+          <TouchableOpacity onPress={savePreferredLocation} style={styles.saveButton}>
             <ThemedText style={styles.saveButtonText}>Save Location</ThemedText>
           </TouchableOpacity>
         )}

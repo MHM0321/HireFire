@@ -10,7 +10,6 @@ public class PaymentController {
 
     @GetMapping("/initiate")
     public PaymentInitiationResponse initiatePayment() {
-        // Hardcoded JazzCash URL as provided
         String jazzCashUrl = "https://sandbox.jazzcash.com.pk/CustomerPortal/transactionmanagement/merchantform" +
                 "?pp_Version=1.1" +
                 "&pp_TxnType=MWALLET" +
@@ -20,7 +19,7 @@ public class PaymentController {
                 "&pp_TxnRefNo=202505011510539A08AF21" +
                 "&pp_Amount=250000" +
                 "&pp_TxnCurrency=PKR" +
-                "&pp_TxnDateTime=20250501151053" +
+                "&pp_TxnDateTime=20250509151053" +
                 "&pp_BillReference=HF-37B4118A" +
                 "&pp_Description=Payment";
 

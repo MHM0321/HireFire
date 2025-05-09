@@ -123,7 +123,10 @@ export default function CustomerPg2CScreen() {
                   </TouchableOpacity>
                   <TouchableOpacity 
                     style={styles.bookButton}
-                    onPress={() => router.push({ pathname: '/customerPg3', params: { userId: user.userId } })}
+                    onPress={() => router.push({ pathname: '/customerPg3', params: {
+                      userId: user.userId,
+                      paramUser: JSON.stringify(user)
+                    } })}
                   >
                     <Text style={styles.bookButtonText}>Hire Details</Text>
                     <Feather name="arrow-right" size={18} color="#FFF" />

@@ -14,8 +14,8 @@ import { useRouter, useLocalSearchParams } from "expo-router/build/exports";
 
 export default function CustomerPg3Screen() {
   const router = useRouter();
-  const { userId } = useLocalSearchParams();
-  const user = usersData.find((u) => u.id === Number(userId));
+  const { userId, paramUser } = useLocalSearchParams();
+  const user = usersData.find((u) => u.id === Number(userId)) || JSON.parse(paramUser);
 
   if (!user) {
     return (
@@ -44,11 +44,17 @@ export default function CustomerPg3Screen() {
             onPress={() =>
               router.push({
                 pathname: "/customerPg4",
-                params: { userId: user.id.toString() },
+                params: { userId: (user.id || user.userId).toString() },
               })
             }
           >
             <Text style={styles.buttonText}>Send Hire Request</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.outlineButton}
+            onPress={() => router.back()}
+          >
+            <Text style={styles.outlineButtonText}>Back</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -122,5 +128,18 @@ const styles = StyleSheet.create({
   buttonText: {
     fontSize: 16,
     color: "#FFFFFF",
+  },
+  outlineButton: {
+    marginTop: 16,
+    paddingVertical: 10,
+    borderWidth: 1,
+    borderRadius: 8,
+    backgroundColor: "white",
+    alignItems: "center",
+    borderColor: "#FF4D4D",
+  },
+  outlineButtonText: {
+    fontSize: 16,
+    color: "#FF4D4D",
   },
 });
