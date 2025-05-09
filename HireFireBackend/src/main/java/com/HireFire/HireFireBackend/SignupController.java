@@ -161,12 +161,11 @@ public class SignupController {
                 String hashedPassword = hashPassword(signupRequest.getPassword());
 
                 // Insert into users table (always - this is the user signup endpoint)
-                String insertUserSql = "INSERT INTO users (name, email, password, is_worker) VALUES (?, ?, ?, ?)";
+                String insertUserSql = "INSERT INTO users (name, email, password) VALUES (?, ?, ?)";
                 try (PreparedStatement stmt = conn.prepareStatement(insertUserSql)) {
                     stmt.setString(1, signupRequest.getName());
                     stmt.setString(2, signupRequest.getEmail());
                     stmt.setString(3, hashedPassword);
-                    stmt.setBoolean(4, false); // Regular user
                     stmt.executeUpdate();
                 }
                 return ResponseEntity.ok(new ApiResponse(true, "User registered successfully"));
