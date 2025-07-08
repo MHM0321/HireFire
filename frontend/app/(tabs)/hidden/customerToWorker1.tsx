@@ -11,7 +11,7 @@ export default function CWScreen1() {
             </View>
 
             <TouchableOpacity style={styles.button}>
-                <Text>Tempo</Text>
+                <Text style={{color: 'white', fontSize: 26, fontWeight: 'bold'}}>Tempo</Text>
             </TouchableOpacity>
 
 
